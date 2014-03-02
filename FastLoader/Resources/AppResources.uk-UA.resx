@@ -122,10 +122,8 @@
     <comment>Controls the FlowDirection for all elements in the RootFrame. Set to the traditional direction of this resource file's language</comment>
   </data>
   <data name="ResourceLanguage" xml:space="preserve">
-    <value>en-US</value>
+    <value>uk-UA</value>
     <comment>Controls the Language and ensures that the font for all elements in the RootFrame aligns with the app's language. Set to the language code of this resource file's language.</comment>
   </data>
-  <data name="ExceptionMessage" xml:space="preserve">
-    <value>Sorry, but open the page on this link fails</value>
-  </data>
-</root>
+  
+<data name="ExceptionMessage" xml:space="preserve"><value>Вибачте, але відкриті сторінку за цим посиланням не вдається</value></data></root>
