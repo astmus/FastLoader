@@ -168,18 +168,19 @@ namespace FastLoader
 			if (e.Uri.OriginalString.StartsWith("storagefile") == false)
 			{
 				e.Cancel = true;
-				Uri uriForNavigate = e.Uri;
+				Uri uriForNavigate = null;
 				//Debug.WriteLine(browser.Source);
 
 				if (e.Uri.OriginalString.Contains("http"))
 				{
-					uriForNavigate = new Uri(e.Uri.OriginalString.Remove(0, e.Uri.OriginalString.IndexOf("http")), UriKind.Absolute);
+					string clearUri = e.Uri.OriginalString.Remove(0, e.Uri.OriginalString.IndexOf("http"));
+					uriForNavigate = new Uri(HttpUtility.UrlDecode(clearUri), UriKind.Absolute);
 					if (_currentDomain.Contains("google"))
 						uriForNavigate = uriForNavigate.RemoveQueryParams("ei", "sa", "ved", "usg");
 					SetCurrentDomainFromUrl(uriForNavigate);
 				}
 				else
-					uriForNavigate = new Uri(_currentDomain + e.Uri.OriginalString, UriKind.Absolute);
+					uriForNavigate = new Uri(HttpUtility.UrlDecode(_currentDomain + e.Uri.OriginalString), UriKind.Absolute);
 
 				// if it file exists in the storage then load it
 				if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(uriForNavigate.GetLocalHystoryFileName()))
