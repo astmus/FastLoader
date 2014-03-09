@@ -20,31 +20,32 @@ using FastLoader.Extensions;
 
 namespace FastLoader
 {
-	public struct DomainPagesCount
-	{
-		public string Domain;
-		public int CountPages;
+	//public struct DomainPagesCount
+	//{
+	//	public string Domain;
+	//	public int CountPages;
 
-		public DomainPagesCount(string domain, int countPages = 0)
-		{
-			this.Domain = domain;
-			this.CountPages = 0;
-		}
+	//	public DomainPagesCount(string domain, int countPages = 0)
+	//	{
+	//		this.Domain = domain;
+	//		this.CountPages = 0;
+	//	}
 
-		public override string ToString()
-		{
-			return Domain;
-		}
+	//	public override string ToString()
+	//	{
+	//		return Domain;
+	//	}
 
-		public bool IsEmpty()
-		{
-			return Domain == String.Empty || Domain == null;
-		}
-	}
+	//	public bool IsEmpty()
+	//	{
+	//		return Domain == String.Empty || Domain == null;
+	//	}
+	//}
 
 	public partial class MainPage : PhoneApplicationPage
 	{
 		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/search?q=";
+		const string START_PAGE_NAME = "storagefilestart.html";
 		// Constructor
 		HttpWebRequest _request;
 		string _currentDomain;
@@ -56,7 +57,8 @@ namespace FastLoader
 		public MainPage()
 		{
 			InitializeComponent();			
-			_currentPage = new Uri("storagefilestart.html", UriKind.Relative);
+			_currentPage = new Uri(START_PAGE_NAME, UriKind.Relative);
+			//_hystory.Push(_currentPage);
 			browser.Navigate(_currentPage);
 		}
 
@@ -72,10 +74,9 @@ namespace FastLoader
 			if (_hystory.Count > 0)
 			{
 				e.Cancel = true;
-				Uri previousPage = _hystory.Pop();
-				if (_hystory.Count != 1)				
-					SetCurrentDomainFromUrl(previousPage);
-				
+				// Pop pages from history occur in browser_Navigating method because 
+				// there we check navigating to new page or back to previous
+				Uri previousPage = _hystory.Peek();
 				_currentPage = previousPage;
 				browser.Navigate(previousPage.AsLocalHystoryUri());
 			}
@@ -112,6 +113,7 @@ namespace FastLoader
 				Dispatcher.BeginInvoke(() =>
 				{
 					progressBar.IsIndeterminate = false;
+					SetCurrentDomainFromUrl(_currentPage);
 					MessageBox.Show(AppResources.ExceptionMessage);
 				});
 				return;
@@ -121,7 +123,7 @@ namespace FastLoader
 			if (response.Headers[HttpRequestHeader.ContentEncoding] == "gzip")
 				sourceStream = new GZipStream(sourceStream, CompressionMode.Decompress);
 
-			string _fileName = _currentPage.GetLocalHystoryFileName();
+			string _fileName = _request.RequestUri.GetLocalHystoryFileName();
 
 			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(_fileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
 			{
@@ -143,10 +145,7 @@ namespace FastLoader
 			this.Focus();
 			//_currentFileName = GetFileNameFromUri(link);
 			progressBar.IsIndeterminate = true;
-
-			_hystory.Push(_currentPage);
-			_currentPage = link;
-
+			//_hystory.Push(_currentPage);
 			_request = WebRequest.CreateHttp(link);
 			_request.BeginGetResponse(new AsyncCallback(HandleResponse), null);
 		}
@@ -185,13 +184,31 @@ namespace FastLoader
 				// if it file exists in the storage then load it
 				if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(uriForNavigate.GetLocalHystoryFileName()))
 				{
-					_hystory.Push(_currentPage);
-					_currentPage = uriForNavigate;
 					browser.Navigate(uriForNavigate.AsLocalHystoryUri());
 					return;
 				}
 
 				Navigate(uriForNavigate);
+			}
+			else
+			{
+				if (_request == null) return;
+
+				if (!_hystory.Contains(_currentPage))
+				{
+					// if we navigating to new loaded page
+					_hystory.Push(_currentPage);
+					_currentPage = _request.RequestUri;
+				}
+				else
+				{
+					// if we step back by history
+					_currentPage = _hystory.Pop();
+					if (_currentPage.OriginalString != START_PAGE_NAME)
+						SetCurrentDomainFromUrl(_currentPage);
+					else
+						_currentDomain = "";
+				}
 			}
 		}
 		

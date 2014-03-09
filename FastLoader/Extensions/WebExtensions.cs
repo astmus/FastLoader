@@ -51,6 +51,7 @@ namespace FastLoader.Extensions
 
 		public static Uri AsLocalHystoryUri(this Uri uri)
 		{
+			if (!uri.IsAbsoluteUri) return uri;
 			StringBuilder b = new StringBuilder(uri.OriginalString);
 
 			foreach (char c in _invalidChars)
