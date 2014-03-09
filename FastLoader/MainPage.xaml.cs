@@ -179,7 +179,7 @@ namespace FastLoader
 					SetCurrentDomainFromUrl(uriForNavigate);
 				}
 				else
-					uriForNavigate = new Uri(HttpUtility.UrlDecode(_currentDomain + e.Uri.OriginalString), UriKind.Absolute);
+					uriForNavigate = new Uri(HttpUtility.UrlDecode(_currentDomain + "/" + e.Uri.OriginalString), UriKind.Absolute);
 
 				// if it file exists in the storage then load it
 				if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(uriForNavigate.GetLocalHystoryFileName()))
