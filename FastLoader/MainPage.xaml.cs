@@ -17,6 +17,7 @@ using System.IO.IsolatedStorage;
 using System.Threading.Tasks;
 using System.IO.Compression;
 using FastLoader.Extensions;
+using System.Text.RegularExpressions;
 
 namespace FastLoader
 {
@@ -58,7 +59,6 @@ namespace FastLoader
 		{
 			InitializeComponent();			
 			_currentPage = new Uri(START_PAGE_NAME, UriKind.Relative);
-			//_hystory.Push(_currentPage);
 			browser.Navigate(_currentPage);
 		}
 
@@ -128,7 +128,20 @@ namespace FastLoader
 			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(_fileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
 			{
 				sourceStream.CopyTo(savefilestr);
-				savefilestr.Close();
+				savefilestr.Close();				
+			}
+
+			string s = "d";
+			using (IsolatedStorageFileStream file = new IsolatedStorageFileStream(_fileName, FileMode.Open, FileAccess.ReadWrite, IsolatedStorageFile.GetUserStoreForApplication()))
+			{
+				StreamReader r = new StreamReader(file);
+				string content = r.ReadToEnd();
+				s = Regex.Replace(content, "</?(?i:img)(.|\n)*?>", "");				
+				file.SetLength(0);
+				StreamWriter sw = new StreamWriter(file);
+				sw.Write(s);
+				//s = Regex.Replace(content, "<[^>]*>",String.Empty);
+				file.Close();
 			}
 
 			Dispatcher.BeginInvoke(() =>
