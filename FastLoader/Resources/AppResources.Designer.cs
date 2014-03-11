@@ -61,6 +61,24 @@ namespace FastLoader.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to clear cache.
+        /// </summary>
+        public static string ClearCacheMenuItem {
+            get {
+                return ResourceManager.GetString("ClearCacheMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear cache and delete all previously downloaded pages?.
+        /// </summary>
+        public static string ClearCacheMessage {
+            get {
+                return ResourceManager.GetString("ClearCacheMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sorry, but open the page on this link fails.
         /// </summary>
         public static string ExceptionMessage {

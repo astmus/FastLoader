@@ -127,5 +127,14 @@
   </data>
   <data name="ExceptionMessage" xml:space="preserve">
     <value>Sorry, but open the page on this link fails</value>
+    <comment>2</comment>
+  </data>
+  <data name="ClearCacheMessage" xml:space="preserve">
+    <value>Clear cache and delete all previously downloaded pages?</value>
+    <comment>1</comment>
+  </data>
+  <data name="ClearCacheMenuItem" xml:space="preserve">
+    <value>clear cache</value>
+    <comment>3</comment>
   </data>
 </root>

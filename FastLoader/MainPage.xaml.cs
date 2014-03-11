@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.IO.Compression;
 using FastLoader.Extensions;
 using System.Text.RegularExpressions;
+using System.Windows.Media;
 
 namespace FastLoader
 {
@@ -57,7 +58,8 @@ namespace FastLoader
 		Dictionary<Uri, String> _uriFileNames = new Dictionary<Uri, string>();
 		public MainPage()
 		{
-			InitializeComponent();			
+			InitializeComponent();
+			BuildLocalizedApplicationBar();
 			_currentPage = new Uri(START_PAGE_NAME, UriKind.Relative);
 			browser.Navigate(_currentPage);
 		}
@@ -118,59 +120,82 @@ namespace FastLoader
 				});
 				return;
 			}
+
 			Stream sourceStream = response.GetResponseStream();
 
 			if (response.Headers[HttpRequestHeader.ContentEncoding] == "gzip")
 				sourceStream = new GZipStream(sourceStream, CompressionMode.Decompress);
 
-			string _fileName = _request.RequestUri.GetLocalHystoryFileName();
+			string fileName = _request.RequestUri.GetLocalHystoryFileName();
 
-			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(_fileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
+			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(fileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
 			{
 				sourceStream.CopyTo(savefilestr);
 				savefilestr.Close();				
 			}
 
-			string s = "d";
-			using (IsolatedStorageFileStream file = new IsolatedStorageFileStream(_fileName, FileMode.Open, FileAccess.ReadWrite, IsolatedStorageFile.GetUserStoreForApplication()))
-			{
-				StreamReader r = new StreamReader(file);
-				string content = r.ReadToEnd();
-				s = Regex.Replace(content, "</?(?i:img)(.|\n)*?>", "");				
-				file.SetLength(0);
-				StreamWriter sw = new StreamWriter(file);
-				sw.Write(s);
-				//s = Regex.Replace(content, "<[^>]*>",String.Empty);
-				file.Close();
-			}
+			RemoveImgTagsFromPageFile(fileName);
 
 			Dispatcher.BeginInvoke(() =>
 			{
-				Uri uriForNavigate = new Uri(_fileName, UriKind.Relative);
+				Uri uriForNavigate = new Uri(fileName, UriKind.Relative);
 				//MessageBox.Show("Navigating to" + Environment.NewLine + uriForNavigate.OriginalString);
 				//_hystory.Push(uriForNavigate);
 				browser.Navigate(uriForNavigate);
 			});
 		}
 
+		void RemoveImgTagsFromPageFile(string fileName)
+		{
+			using (IsolatedStorageFileStream file = new IsolatedStorageFileStream(fileName, FileMode.Open, FileAccess.ReadWrite, IsolatedStorageFile.GetUserStoreForApplication()))
+			{
+				StreamReader r = new StreamReader(file);
+				string content = r.ReadToEnd();
+				string withoutImg = Regex.Replace(content, "</?(?i:img)(.|\n)*?>", "");
+				file.SetLength(0);
+				StreamWriter sw = new StreamWriter(file);
+				sw.Write(withoutImg);
+				//s = Regex.Replace(content, "<[^>]*>",String.Empty);
+				file.Close();
+			}
+		}
+
+		/// <summary>
+		/// Load page from url to isolated storage and navigate to it
+		/// </summary>
+		/// <param name="link"></param>
 		void Navigate(Uri link)
 		{
 			this.Focus();
-			//_currentFileName = GetFileNameFromUri(link);
 			progressBar.IsIndeterminate = true;
-			//_hystory.Push(_currentPage);
 			_request = WebRequest.CreateHttp(link);
-			_request.BeginGetResponse(new AsyncCallback(HandleResponse), null);
+
+			// if it file exists in the storage then load it
+			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(link.GetLocalHystoryFileName()))
+			{
+				//_currentPage = uriForNavigate;
+				browser.Navigate(link.AsLocalHystoryUri());
+			}
+			else
+				_request.BeginGetResponse(new AsyncCallback(HandleResponse), null);
 		}
 
+		/// <summary>
+		/// Search entered words by google
+		/// </summary>
+		/// <param name="search"></param>
 		void Search(string search)
 		{
-			//search = HttpUtility.UrlEncode(search);
 			Uri uriForSearch = new Uri(GOOGLE_SEARCH_DOMAIN + search, UriKind.Absolute);
 			Navigate(uriForSearch);
 		}
 
 		private void browser_Navigated(object sender, NavigationEventArgs e)
+		{
+			progressBar.IsIndeterminate = false;
+		}
+
+		private void browser_NavigationFailed(object sender, NavigationFailedEventArgs e)
 		{
 			progressBar.IsIndeterminate = false;
 		}
@@ -193,13 +218,6 @@ namespace FastLoader
 				}
 				else
 					uriForNavigate = new Uri(HttpUtility.UrlDecode(_currentDomain + "/" + e.Uri.OriginalString), UriKind.Absolute);
-
-				// if it file exists in the storage then load it
-				if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(uriForNavigate.GetLocalHystoryFileName()))
-				{
-					browser.Navigate(uriForNavigate.AsLocalHystoryUri());
-					return;
-				}
 
 				Navigate(uriForNavigate);
 			}
@@ -229,21 +247,58 @@ namespace FastLoader
 		{
 			_currentDomain = navigateUrl.Scheme + "://" + navigateUrl.Host;
 		}
-		
+
+		private void ApplicationBar_StateChanged(object sender, ApplicationBarStateChangedEventArgs e)
+		{
+			(sender as ApplicationBar).Opacity = e.IsMenuVisible ? 1 : 0;
+		}
+
+		private void ClearCacheMenuPressed(object sender, EventArgs e)
+		{
+			long size = IsolatedStorageFile.GetUserStoreForApplication().GetCurretnSize();
+			if (MessageBox.Show(AppResources.ClearCacheMessage + " ( " + Convert(size) + " )","",MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+			{
+				using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
+				{
+					isf.Remove();
+					_hystory.Clear();
+					_currentPage = new Uri(START_PAGE_NAME, UriKind.Relative);
+					browser.Navigate(_currentPage);
+				}
+			}
+		}
+
+		private static string format = "0.00";
+		public static string Convert(long value)
+		{
+			double res = (double)value;
+
+			if (res / 1024 < 1)
+				return (res).ToString(format) + " Byte";
+			res /= 1024;
+
+			if (res / 1024 < 1)
+				return (res).ToString(format) + " KByte";
+			res /= 1024;
+
+			if (res / 1024 < 1)
+				return (res).ToString(format) + " MByte";
+
+			return (res / 1024).ToString(format) + " GByte";
+		}
+
 		// Sample code for building a localized ApplicationBar
-		//private void BuildLocalizedApplicationBar()
-		//{
-		//    // Set the page's ApplicationBar to a new instance of ApplicationBar.
-		//    ApplicationBar = new ApplicationBar();
-
-		//    // Create a new button and set the text value to the localized string from AppResources.
-		//    ApplicationBarIconButton appBarButton = new ApplicationBarIconButton(new Uri("/Assets/AppBar/appbar.add.rest.png", UriKind.Relative));
-		//    appBarButton.Text = AppResources.AppBarButtonText;
-		//    ApplicationBar.Buttons.Add(appBarButton);
-
-		//    // Create a new menu item with the localized string from AppResources.
-		//    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.AppBarMenuItemText);
-		//    ApplicationBar.MenuItems.Add(appBarMenuItem);
-		//}
+		private void BuildLocalizedApplicationBar()
+		{
+		    // Set the page's ApplicationBar to a new instance of ApplicationBar.
+		    ApplicationBar = new ApplicationBar();
+			ApplicationBar.Mode = ApplicationBarMode.Minimized;
+			ApplicationBar.Opacity = 0;
+			ApplicationBar.ForegroundColor = (Color)Application.Current.Resources["PhoneAccentColor"];
+			ApplicationBar.StateChanged += ApplicationBar_StateChanged;
+		    // Create a new menu item with the localized string from AppResources.
+		    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.ClearCacheMenuItem);
+		    ApplicationBar.MenuItems.Add(appBarMenuItem);
+		}
 	}
 }

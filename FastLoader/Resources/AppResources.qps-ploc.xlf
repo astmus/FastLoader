@@ -16,9 +16,20 @@
           <target state="translated">qps-ploc</target>
           
         <note from="MultilingualBuild" annotates="source" priority="2">Controls the Language and ensures that the font for all elements in the RootFrame aligns with the app's language. Set to the language code of this resource file's language.</note></trans-unit>
-        <trans-unit translate="yes" id="Resx/ExceptionMessage" xml:space="preserve">
+        <trans-unit id="Resx/ExceptionMessage" translate="yes" xml:space="preserve">
           <source>Sorry, but open the page on this link fails</source>
           <target state="new">Sorry, but open the page on this link fails</target>
+          
+        <note from="MultilingualBuild" annotates="source" priority="2">2</note></trans-unit>
+        <trans-unit id="Resx/ClearCacheMessage" translate="yes" xml:space="preserve">
+          <source>Clear cache and delete all previously downloaded pages?</source>
+          <target state="new">Clear cache and delete all previously downloaded pages?</target>
+          
+        <note from="MultilingualBuild" annotates="source" priority="2">1</note></trans-unit>
+        <trans-unit translate="yes" id="Resx/ClearCacheMenuItem" xml:space="preserve">
+          <source>clear cache</source>
+          <target state="new">clear cache</target>
+          <note from="MultilingualBuild" annotates="source" priority="2">3</note>
         </trans-unit>
       </group>
     </body>

@@ -126,4 +126,6 @@
     <comment>Controls the Language and ensures that the font for all elements in the RootFrame aligns with the app's language. Set to the language code of this resource file's language.</comment>
   </data>
   
-<data name="ExceptionMessage" xml:space="preserve"><value>Извините, но открыть страницу по этой ссылке не удается</value></data></root>
+  
+  
+<data name="ExceptionMessage" xml:space="preserve"><value>Извините, но открытые страницы по этой ссылке не удается</value><comment>2</comment></data><data name="ClearCacheMessage" xml:space="preserve"><value>Очистить кэш и удалить все ранее загруженные страницы?</value><comment>1</comment></data><data name="ClearCacheMenuItem" xml:space="preserve"><value>очистить кэш</value><comment>3</comment></data></root>

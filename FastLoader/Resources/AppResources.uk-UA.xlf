@@ -18,8 +18,19 @@
         <note from="MultilingualBuild" annotates="source" priority="2">Controls the Language and ensures that the font for all elements in the RootFrame aligns with the app's language. Set to the language code of this resource file's language.</note></trans-unit>
         <trans-unit id="Resx/ExceptionMessage" translate="yes" xml:space="preserve">
           <source>Sorry, but open the page on this link fails</source>
-          <target state="translated">Вибачте, але відкриті сторінку за цим посиланням не вдається</target>
-        </trans-unit>
+          <target state="needs-review-translation" state-qualifier="mt-suggestion">Вибачте, але відкриті сторінки на це посилання не вдається</target>
+          
+        <note from="MultilingualBuild" annotates="source" priority="2">2</note></trans-unit>
+        <trans-unit id="Resx/ClearCacheMessage" translate="yes" xml:space="preserve">
+          <source>Clear cache and delete all previously downloaded pages?</source>
+          <target state="needs-review-translation" state-qualifier="mt-suggestion">Очистити кеш-пам'ять і видалити всі попередньо завантаженого сторінки?</target>
+          
+        <note from="MultilingualBuild" annotates="source" priority="2">1</note></trans-unit>
+        <trans-unit id="Resx/ClearCacheMenuItem" translate="yes" xml:space="preserve">
+          <source>clear cache</source>
+          <target state="needs-review-translation">очистити кеш</target>
+          
+        <note from="MultilingualBuild" annotates="source" priority="2">3</note><note from="MultilingualUpdate" priority="2" annotates="source">Please verify the translation’s accuracy as the source string was updated after it was translated.</note></trans-unit>
       </group>
     </body>
   </file>
