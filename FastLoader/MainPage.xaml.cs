@@ -291,13 +291,14 @@ namespace FastLoader
 		private void BuildLocalizedApplicationBar()
 		{
 		    // Set the page's ApplicationBar to a new instance of ApplicationBar.
-		    ApplicationBar = new ApplicationBar();
+		    ApplicationBar = new ApplicationBar();			
 			ApplicationBar.Mode = ApplicationBarMode.Minimized;
 			ApplicationBar.Opacity = 0;
 			ApplicationBar.ForegroundColor = (Color)Application.Current.Resources["PhoneAccentColor"];
 			ApplicationBar.StateChanged += ApplicationBar_StateChanged;
 		    // Create a new menu item with the localized string from AppResources.
 		    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.ClearCacheMenuItem);
+			appBarMenuItem.Click += ClearCacheMenuPressed;
 		    ApplicationBar.MenuItems.Add(appBarMenuItem);
 		}
 	}

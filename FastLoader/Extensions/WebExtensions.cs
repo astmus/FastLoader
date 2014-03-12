@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace FastLoader.Extensions
 {
@@ -12,7 +13,7 @@ namespace FastLoader.Extensions
 		static char[] _invalidChars;
 		static WebExtensions()
 		{
-			_invalidChars = Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).ToArray();
+			_invalidChars = Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).Concat(new []{'#'}).ToArray();
 		}
 
 		public static Uri RemoveQueryParams(this Uri uri, params string[] keys)
@@ -52,24 +53,10 @@ namespace FastLoader.Extensions
 		public static Uri AsLocalHystoryUri(this Uri uri)
 		{
 			if (!uri.IsAbsoluteUri) return uri;
-			StringBuilder b = new StringBuilder(uri.OriginalString);
-
-			foreach (char c in _invalidChars)
-				b.Replace(c, ' ');
-
-			//b.Remove(0, 11);
-			b.Insert(0, "storagefile");
-			b.Replace(" ", "");
-			b.Replace(".", "");
-			b.Append(".html");
-			return new Uri(b.Length < 150 ? b.ToString() : b.ToString(0, 150),UriKind.Relative);
+			string res = WebExtensions.GetLocalHystoryFileName(uri);
+			Debug.WriteLine(res);
+			return new Uri(res, UriKind.Relative);
 		}
 
-
-		public static int WordCount(this String str)
-		{
-			return str.Split(new char[] { ' ', '.', '?' },
-							 StringSplitOptions.RemoveEmptyEntries).Length;
-		}
 	}
 }
