@@ -19,6 +19,7 @@ using System.IO.Compression;
 using FastLoader.Extensions;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
+using MSPToolkit.Encodings;
 
 namespace FastLoader
 {
@@ -121,17 +122,40 @@ namespace FastLoader
 				return;
 			}
 
-			Stream sourceStream = response.GetResponseStream();
-
+			Stream sourceStream = Utils.CopyAndClose(response.GetResponseStream());
+			
 			if (response.Headers[HttpRequestHeader.ContentEncoding] == "gzip")
 				sourceStream = new GZipStream(sourceStream, CompressionMode.Decompress);
 
 			string fileName = _request.RequestUri.GetLocalHystoryFileName();
 
 			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(fileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
-			{
-				sourceStream.CopyTo(savefilestr);
-				savefilestr.Close();				
+			{				
+				StreamReader sourceReader = new StreamReader(sourceStream);
+				string content = sourceReader.ReadToEnd();
+				string charset = null;
+				try
+				{
+					charset = Regex.Match(content, "charset=([^\";']+)").Groups[1].Value;
+				}
+				catch (System.Exception ex)
+				{
+					MessageBox.Show("parse charset error");
+				}
+		
+				Encoding encoding = Utils.GetEncodingByString(charset);
+
+				if (encoding != null)
+				{
+					sourceStream.Position = 0;
+					StreamReader r = new StreamReader(sourceStream, encoding);
+					content = r.ReadToEnd();
+					content = content.Replace(charset, "utf-8");
+				}
+				
+				StreamWriter sw = new StreamWriter(savefilestr);
+				sw.Write(content);
+				savefilestr.Close();		
 			}
 
 			RemoveImgTagsFromPageFile(fileName);
@@ -256,7 +280,7 @@ namespace FastLoader
 		private void ClearCacheMenuPressed(object sender, EventArgs e)
 		{
 			long size = IsolatedStorageFile.GetUserStoreForApplication().GetCurretnSize();
-			if (MessageBox.Show(AppResources.ClearCacheMessage + " ( " + Convert(size) + " )","",MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+			if (MessageBox.Show(AppResources.ClearCacheMessage + " ( " + Utils.ConvertCountBytesToString(size) + " )","",MessageBoxButton.OKCancel) == MessageBoxResult.OK)
 			{
 				using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
 				{
@@ -266,26 +290,7 @@ namespace FastLoader
 					browser.Navigate(_currentPage);
 				}
 			}
-		}
-
-		private static string format = "0.00";
-		public static string Convert(long value)
-		{
-			double res = (double)value;
-
-			if (res / 1024 < 1)
-				return (res).ToString(format) + " Byte";
-			res /= 1024;
-
-			if (res / 1024 < 1)
-				return (res).ToString(format) + " KByte";
-			res /= 1024;
-
-			if (res / 1024 < 1)
-				return (res).ToString(format) + " MByte";
-
-			return (res / 1024).ToString(format) + " GByte";
-		}
+		}	
 
 		// Sample code for building a localized ApplicationBar
 		private void BuildLocalizedApplicationBar()
