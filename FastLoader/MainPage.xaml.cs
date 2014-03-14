@@ -156,7 +156,7 @@ namespace FastLoader
 					content = content.Replace(charset, "utf-8");
 				}
 
-				RemoveImgTagsFromPage(content);
+				RemoveImgTagsFromPage(ref content);
 
 				StreamWriter sw = new StreamWriter(savefilestr);
 				sw.Write(content);
@@ -174,7 +174,7 @@ namespace FastLoader
 			});
 		}
 
-		void RemoveImgTagsFromPage(string pageContent)
+		void RemoveImgTagsFromPage(ref string pageContent)
 		{				
 			pageContent = Regex.Replace(pageContent, "</?(?i:img)(.|\n)*?>", "");
 		}
@@ -300,6 +300,16 @@ namespace FastLoader
 		    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.ClearCacheMenuItem);
 			appBarMenuItem.Click += ClearCacheMenuPressed;
 		    ApplicationBar.MenuItems.Add(appBarMenuItem);
+		}
+
+		private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+		{
+			ApplicationBar.Opacity = 1;
+		}
+
+		private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+		{
+			ApplicationBar.Opacity = 0;
 		}
 	}
 }
