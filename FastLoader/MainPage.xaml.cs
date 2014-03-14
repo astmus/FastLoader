@@ -117,7 +117,7 @@ namespace FastLoader
 				{
 					progressBar.IsIndeterminate = false;
 					SetCurrentDomainFromUrl(_currentPage);
-					MessageBox.Show(AppResources.ExceptionMessage);
+					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString);
 				});
 				return;
 			}
@@ -134,9 +134,12 @@ namespace FastLoader
 				StreamReader sourceReader = new StreamReader(sourceStream);
 				string content = sourceReader.ReadToEnd();
 				string charset = null;
+
 				try
 				{
 					charset = Regex.Match(content, "charset=([^\";']+)").Groups[1].Value;
+					if (charset == "")
+						content = content.Insert(content.IndexOf("<head>")+6,"<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\">");
 				}
 				catch (System.Exception ex)
 				{
@@ -152,13 +155,15 @@ namespace FastLoader
 					content = r.ReadToEnd();
 					content = content.Replace(charset, "utf-8");
 				}
-				
+
+				RemoveImgTagsFromPage(content);
+
 				StreamWriter sw = new StreamWriter(savefilestr);
 				sw.Write(content);
 				savefilestr.Close();		
 			}
 
-			RemoveImgTagsFromPageFile(fileName);
+			
 
 			Dispatcher.BeginInvoke(() =>
 			{
@@ -169,19 +174,9 @@ namespace FastLoader
 			});
 		}
 
-		void RemoveImgTagsFromPageFile(string fileName)
-		{
-			using (IsolatedStorageFileStream file = new IsolatedStorageFileStream(fileName, FileMode.Open, FileAccess.ReadWrite, IsolatedStorageFile.GetUserStoreForApplication()))
-			{
-				StreamReader r = new StreamReader(file);
-				string content = r.ReadToEnd();
-				string withoutImg = Regex.Replace(content, "</?(?i:img)(.|\n)*?>", "");
-				file.SetLength(0);
-				StreamWriter sw = new StreamWriter(file);
-				sw.Write(withoutImg);
-				//s = Regex.Replace(content, "<[^>]*>",String.Empty);
-				file.Close();
-			}
+		void RemoveImgTagsFromPage(string pageContent)
+		{				
+			pageContent = Regex.Replace(pageContent, "</?(?i:img)(.|\n)*?>", "");
 		}
 
 		/// <summary>
@@ -274,7 +269,7 @@ namespace FastLoader
 
 		private void ApplicationBar_StateChanged(object sender, ApplicationBarStateChangedEventArgs e)
 		{
-			(sender as ApplicationBar).Opacity = e.IsMenuVisible ? 1 : 0;
+			(sender as ApplicationBar).Opacity = e.IsMenuVisible ? 0.75 : 0;
 		}
 
 		private void ClearCacheMenuPressed(object sender, EventArgs e)

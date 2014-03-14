@@ -35,11 +35,10 @@ namespace FastLoader
 			byte[] buffer = new byte[readSize];
 			MemoryStream ms = new MemoryStream();
 
-			int count = inputStream.Read(buffer, 0, readSize);
-			while (count > 0)
+			int count;
+			while ((count = inputStream.Read(buffer, 0, readSize)) > 0)
 			{
 				ms.Write(buffer, 0, count);
-				count = inputStream.Read(buffer, 0, readSize);
 			}
 			ms.Position = 0;
 			inputStream.Close();
@@ -61,23 +60,23 @@ namespace FastLoader
 			switch (charset)
 			{
 				case WINDOWS_1250:
-					break;
+					return new Windows1250Encoding();
 				case WINDOWS_1251:
 					return new Windows1251Encoding();
 				case WINDOWS_1252:
-					break;
+					return new Windows1252Encoding();
 				case WINDOWS_1253:
-					break;
+					return new Windows1253Encoding();
 				case WINDOWS_1254:
-					break;
+					return new Windows1254Encoding();
 				case WINDOWS_1255:
-					break;
+					return new Windows1255Encoding();
 				case WINDOWS_1256:
-					break;
+					return new Windows1256Encoding();
 				case WINDOWS_1257:
-					break;
+					return new Windows1257Encoding();
 				case WINDOWS_1258:
-					break;
+					return new Windows1258Encoding();
 			}
 			return null;
 		}
