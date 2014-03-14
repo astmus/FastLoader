@@ -163,14 +163,11 @@ namespace FastLoader
 				savefilestr.Close();		
 			}
 
-			
+			sourceStream.Dispose();
 
 			Dispatcher.BeginInvoke(() =>
 			{
-				Uri uriForNavigate = new Uri(fileName, UriKind.Relative);
-				//MessageBox.Show("Navigating to" + Environment.NewLine + uriForNavigate.OriginalString);
-				//_hystory.Push(uriForNavigate);
-				browser.Navigate(uriForNavigate);
+				browser.Navigate(new Uri(fileName, UriKind.Relative));
 			});
 		}
 
