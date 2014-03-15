@@ -20,6 +20,7 @@ using FastLoader.Extensions;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
 using MSPToolkit.Encodings;
+using Microsoft.Phone.Tasks;
 
 namespace FastLoader
 {
@@ -47,7 +48,7 @@ namespace FastLoader
 
 	public partial class MainPage : PhoneApplicationPage
 	{
-		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/search?q=";
+		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/m/search?q=";
 		const string START_PAGE_NAME = "storagefilestart.html";
 		// Constructor
 		HttpWebRequest _request;
@@ -90,8 +91,15 @@ namespace FastLoader
 			if (e.Key == Key.Enter)
 			{
 				Uri outputUri;
-				string urlAddress = "http://" + (sender as TextBox).Text;
-				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && (sender as TextBox).Text.Contains('.'))
+				string enteredString = (sender as TextBox).Text;
+				if (enteredString == "")
+				{
+					this.Focus();
+					return;
+				}
+
+				string urlAddress = "http://" + enteredString;
+				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && enteredString.Contains('.'))
 				{
 					SetCurrentDomainFromUrl(outputUri);
 					Navigate(outputUri);
@@ -99,7 +107,7 @@ namespace FastLoader
 				else
 				{
 					SetCurrentDomainFromUrl(new Uri("https://www.google.com",UriKind.Absolute));
-					Search((sender as TextBox).Text);
+					Search(enteredString);
 				}
 			}
 		}
@@ -185,7 +193,7 @@ namespace FastLoader
 			this.Focus();
 			progressBar.IsIndeterminate = true;
 			_request = WebRequest.CreateHttp(link);
-
+			
 			// if it file exists in the storage then load it
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(link.GetLocalHystoryFileName()))
 			{
@@ -266,7 +274,7 @@ namespace FastLoader
 
 		private void ApplicationBar_StateChanged(object sender, ApplicationBarStateChangedEventArgs e)
 		{
-			(sender as ApplicationBar).Opacity = e.IsMenuVisible ? 0.75 : 0;
+			(sender as ApplicationBar).Opacity = e.IsMenuVisible ? 0.85 : 0;
 		}
 
 		private void ClearCacheMenuPressed(object sender, EventArgs e)
@@ -295,8 +303,21 @@ namespace FastLoader
 			ApplicationBar.StateChanged += ApplicationBar_StateChanged;
 		    // Create a new menu item with the localized string from AppResources.
 		    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.ClearCacheMenuItem);
-			appBarMenuItem.Click += ClearCacheMenuPressed;
+			appBarMenuItem.Click += ClearCacheMenuPressed;			
 		    ApplicationBar.MenuItems.Add(appBarMenuItem);
+			ApplicationBarMenuItem appBarMenuItem2 = new ApplicationBarMenuItem("OpenInExternalBrowser");
+			appBarMenuItem2.Click += appBarMenuItem2_Click;
+			ApplicationBar.MenuItems.Add(appBarMenuItem2);
+		}
+
+		void appBarMenuItem2_Click(object sender, EventArgs e)
+		{
+			if (_hystory.Count >= 1)
+			{
+				WebBrowserTask wb = new WebBrowserTask();
+				wb.Uri = _currentPage;
+				wb.Show();
+			}			
 		}
 
 		private void TextBox_GotFocus(object sender, RoutedEventArgs e)
