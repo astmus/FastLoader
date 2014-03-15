@@ -266,7 +266,7 @@ namespace FastLoader
 
 		private void ApplicationBar_StateChanged(object sender, ApplicationBarStateChangedEventArgs e)
 		{
-			(sender as ApplicationBar).Opacity = e.IsMenuVisible ? 0.75 : 0;
+			(sender as ApplicationBar).Opacity = e.IsMenuVisible ? 0.85 : 0;
 		}
 
 		private void ClearCacheMenuPressed(object sender, EventArgs e)
