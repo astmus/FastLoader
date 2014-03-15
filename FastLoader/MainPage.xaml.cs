@@ -185,7 +185,7 @@ namespace FastLoader
 			this.Focus();
 			progressBar.IsIndeterminate = true;
 			_request = WebRequest.CreateHttp(link);
-
+			_request.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 			// if it file exists in the storage then load it
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(link.GetLocalHystoryFileName()))
 			{
