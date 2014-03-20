@@ -90,7 +90,10 @@ namespace FastLoader
 			if (e.Key == Key.Enter)
 			{
 				Uri outputUri;
-				string urlAddress = "http://" + (sender as TextBox).Text;
+				string urlAddress = (sender as TextBox).Text;
+				if (urlAddress.IndexOf("http") == -1)
+					urlAddress= "http://" + urlAddress;
+
 				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && (sender as TextBox).Text.Contains('.'))
 				{
 					SetCurrentDomainFromUrl(outputUri);
@@ -116,7 +119,8 @@ namespace FastLoader
 				Dispatcher.BeginInvoke(() =>
 				{
 					progressBar.IsIndeterminate = false;
-					SetCurrentDomainFromUrl(_currentPage);
+					if (_currentPage.OriginalString != START_PAGE_NAME)
+						SetCurrentDomainFromUrl(_currentPage);
 					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString);
 				});
 				return;

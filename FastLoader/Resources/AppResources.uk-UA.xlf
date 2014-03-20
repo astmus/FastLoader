@@ -32,10 +32,10 @@
           
         <note from="MultilingualBuild" annotates="source" priority="2">3</note><note from="MultilingualUpdate" annotates="source" priority="2">Please verify the translation’s accuracy as the source string was updated after it was translated.</note></trans-unit>
         <trans-unit translate="yes" id="Resx/AboutText" xml:space="preserve">
-          <source>about text</source>
-          <target state="new">about text</target>
+          <source>Fast loading pages from internet and offline viewing.</source>
+          <target state="needs-review-translation">Швидке завантаженны сторінок з інтернету з подальшим переглядом оффлайн.</target>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">7</note></trans-unit>
+        <note from="MultilingualBuild" annotates="source" priority="2">7</note><note from="MultilingualUpdate" priority="2" annotates="source">Please verify the translation’s accuracy as the source string was updated after it was translated.</note></trans-unit>
         <trans-unit translate="yes" id="Resx/Refresh" xml:space="preserve">
           <source>Refresh</source>
           <target state="translated">Оновити</target>

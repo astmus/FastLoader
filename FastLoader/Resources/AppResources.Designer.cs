@@ -70,7 +70,7 @@ namespace FastLoader.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to about text.
+        ///   Looks up a localized string similar to Fast loading pages from internet and offline viewing..
         /// </summary>
         public static string AboutText {
             get {

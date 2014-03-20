@@ -27,8 +27,7 @@
                 <StackPanel>
                     <StackPanel Margin="12,17,0,28">
                     <TextBlock x:Name="appName"  Text="Fast Loader"/>
-                    <TextBlock x:Name="aboutText"  Text=""/>
-                    
+                        <TextBlock x:Name="aboutText" TextWrapping="Wrap"  Text="{Binding Path=LocalizedResources.AboutText, Source={StaticResource LocalizedStrings}}"/>
                     </StackPanel>
                 <Button Content="{Binding Path=LocalizedResources.RateApp, Source={StaticResource LocalizedStrings}}" Click="Button_Click" />
                 </StackPanel>
