@@ -26,10 +26,29 @@
           <target state="new">Clear cache and delete all previously downloaded pages?</target>
           
         <note from="MultilingualBuild" annotates="source" priority="2">1</note></trans-unit>
-        <trans-unit translate="yes" id="Resx/ClearCacheMenuItem" xml:space="preserve">
+        <trans-unit id="Resx/ClearCacheMenuItem" translate="yes" xml:space="preserve">
           <source>clear cache</source>
           <target state="new">clear cache</target>
-          <note from="MultilingualBuild" annotates="source" priority="2">3</note>
+          
+        <note from="MultilingualBuild" annotates="source" priority="2">3</note></trans-unit>
+        <trans-unit id="Resx/About" translate="yes" xml:space="preserve">
+          <source>about</source>
+          <target state="new">about</target>
+          
+        <note from="MultilingualBuild" annotates="source" priority="2">4</note></trans-unit>
+        <trans-unit translate="yes" id="Resx/AboutText" xml:space="preserve">
+          <source>about text</source>
+          <target state="new">about text</target>
+          <note from="MultilingualBuild" annotates="source" priority="2">7</note>
+        </trans-unit>
+        <trans-unit translate="yes" id="Resx/Refresh" xml:space="preserve">
+          <source>Refresh</source>
+          <target state="new">Refresh</target>
+        </trans-unit>
+        <trans-unit translate="yes" id="Resx/RateApp" xml:space="preserve">
+          <source>rate application</source>
+          <target state="new">rate application</target>
+          <note from="MultilingualBuild" annotates="source" priority="2">5</note>
         </trans-unit>
       </group>
     </body>

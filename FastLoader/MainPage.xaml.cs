@@ -297,6 +297,11 @@ namespace FastLoader
 		    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.ClearCacheMenuItem);
 			appBarMenuItem.Click += ClearCacheMenuPressed;
 		    ApplicationBar.MenuItems.Add(appBarMenuItem);
+
+			appBarMenuItem = new ApplicationBarMenuItem(AppResources.About);
+			appBarMenuItem.Click += (object sender, EventArgs e) => { NavigationService.Navigate(new Uri("/AboutPage.xaml", UriKind.Relative)); };
+			ApplicationBar.MenuItems.Add(appBarMenuItem);
+
 		}
 
 		private void TextBox_GotFocus(object sender, RoutedEventArgs e)
