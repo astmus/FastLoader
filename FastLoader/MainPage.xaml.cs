@@ -121,12 +121,16 @@ namespace FastLoader
 					progressBar.IsIndeterminate = false;
 					if (_currentPage.OriginalString != START_PAGE_NAME)
 						SetCurrentDomainFromUrl(_currentPage);
-					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString);
+#if DEBUG
+					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString+Environment.NewLine+e.Message);
+#else
+					MessageBox.Show(AppResources.ExceptionMessage);
+#endif
 				});
 				return;
 			}
 
-			Stream sourceStream = Utils.CopyAndClose(response.GetResponseStream());
+			Stream sourceStream = Utils.CopyAndClose(response.GetResponseStream(), (int)response.ContentLength);
 			
 			if (response.Headers[HttpRequestHeader.ContentEncoding] == "gzip")
 				sourceStream = new GZipStream(sourceStream, CompressionMode.Decompress);
@@ -189,6 +193,7 @@ namespace FastLoader
 			this.Focus();
 			progressBar.IsIndeterminate = true;
 			_request = WebRequest.CreateHttp(link);
+			_request.AllowReadStreamBuffering = false; 
 			_request.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 			// if it file exists in the storage then load it
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(link.GetLocalHystoryFileName()))

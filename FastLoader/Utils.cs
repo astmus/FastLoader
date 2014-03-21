@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MSPToolkit.Encodings;
 using System.IO;
+using System.Diagnostics;
 
 namespace FastLoader
 {
@@ -29,17 +30,29 @@ namespace FastLoader
 			return (res / 1024).ToString(format) + " GByte";
 		}
 
-		public static Stream CopyAndClose(Stream inputStream)
+		public static Stream CopyAndClose(Stream inputStream, int expectedLength)
 		{
 			const int readSize = 256;
 			byte[] buffer = new byte[readSize];
 			MemoryStream ms = new MemoryStream();
-
+						
 			int count;
+#if DEBUG
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
+
 			while ((count = inputStream.Read(buffer, 0, readSize)) > 0)
 			{
 				ms.Write(buffer, 0, count);
+				Debug.WriteLine(ms.Length * 100 / expectedLength);
 			}
+
+			Debug.WriteLine(sw.ElapsedMilliseconds);
+#else
+			while ((count = inputStream.Read(buffer, 0, readSize)) > 0)
+				ms.Write(buffer, 0, count);
+#endif
+
 			ms.Position = 0;
 			inputStream.Close();
 			return ms;
