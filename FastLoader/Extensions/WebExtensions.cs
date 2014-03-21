@@ -45,9 +45,9 @@ namespace FastLoader.Extensions
 			//b.Remove(0, 11);
 			b.Insert(0, "storagefile");
 			b.Replace(" ", "");
-			b.Replace(".", "");
-			b.Append(".html");
-			return b.Length < 150 ? b.ToString() : b.ToString(0, 150);
+			b.Replace(".", "");            
+			b.Append(".html");            
+            return b.Length < 150 ? b.ToString() : b.Remove(150, b.Length - 156).ToString();            
 		}
 
 		public static Uri AsLocalHystoryUri(this Uri uri)
