@@ -137,10 +137,6 @@
     <value>clear cache</value>
     <comment>3</comment>
   </data>
-  <data name="About" xml:space="preserve">
-    <value>about</value>
-    <comment>4</comment>
-  </data>
   <data name="RateApp" xml:space="preserve">
     <value>rate application</value>
     <comment>5</comment>
@@ -151,5 +147,9 @@
   </data>
   <data name="Refresh" xml:space="preserve">
     <value>Refresh</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>about</value>
+    <comment>9</comment>
   </data>
 </root>

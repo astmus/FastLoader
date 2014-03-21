@@ -18,7 +18,7 @@
         <note from="MultilingualBuild" annotates="source" priority="2">Controls the Language and ensures that the font for all elements in the RootFrame aligns with the app's language. Set to the language code of this resource file's language.</note></trans-unit>
         <trans-unit id="Resx/ExceptionMessage" translate="yes" xml:space="preserve">
           <source>Sorry, but open the page on this link fails</source>
-          <target state="needs-review-translation" state-qualifier="mt-suggestion">Вибачте, але відкриті сторінки на це посилання не вдається</target>
+          <target state="translated">Вибачте, але відкриті сторінки за цим посилання не вдається</target>
           
         <note from="MultilingualBuild" annotates="source" priority="2">2</note></trans-unit>
         <trans-unit id="Resx/ClearCacheMessage" translate="yes" xml:space="preserve">
@@ -35,21 +35,21 @@
           <source>Fast loading pages from internet and offline viewing.</source>
           <target state="needs-review-translation">Швидке завантаженны сторінок з інтернету з подальшим переглядом оффлайн.</target>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">7</note><note from="MultilingualUpdate" priority="2" annotates="source">Please verify the translation’s accuracy as the source string was updated after it was translated.</note></trans-unit>
+        <note from="MultilingualBuild" annotates="source" priority="2">7</note><note from="MultilingualUpdate" annotates="source" priority="2">Please verify the translation’s accuracy as the source string was updated after it was translated.</note></trans-unit>
         <trans-unit translate="yes" id="Resx/Refresh" xml:space="preserve">
           <source>Refresh</source>
           <target state="translated">Оновити</target>
         </trans-unit>
+        <trans-unit translate="yes" id="Resx/About" xml:space="preserve">
+          <source>about</source>
+          <target state="translated">про программу</target>
+          
+        <note from="MultilingualBuild" annotates="source" priority="2">9</note></trans-unit>
         <trans-unit translate="yes" id="Resx/RateApp" xml:space="preserve">
           <source>rate application</source>
           <target state="translated">оцінити програму</target>
           
         <note from="MultilingualBuild" annotates="source" priority="2">5</note></trans-unit>
-        <trans-unit translate="yes" id="Resx/About" xml:space="preserve">
-          <source>about</source>
-          <target state="new">about</target>
-          
-        <note from="MultilingualBuild" annotates="source" priority="2">4</note></trans-unit>
       </group>
     </body>
   </file>
