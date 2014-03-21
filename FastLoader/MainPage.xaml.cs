@@ -121,7 +121,11 @@ namespace FastLoader
 					progressBar.IsIndeterminate = false;
 					if (_currentPage.OriginalString != START_PAGE_NAME)
 						SetCurrentDomainFromUrl(_currentPage);
-					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString);
+#if DEBUG
+					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString+Environment.NewLine+e.Message);
+#else
+                    MessageBox.Show(AppResources.ExceptionMessage);
+#endif
 				});
 				return;
 			}
