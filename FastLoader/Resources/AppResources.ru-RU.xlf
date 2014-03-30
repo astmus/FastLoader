@@ -45,6 +45,10 @@
           <target state="translated">о программе</target>
           
         <note from="MultilingualBuild" annotates="source" priority="2">9</note></trans-unit>
+        <trans-unit translate="yes" id="Resx/OpenInIE" xml:space="preserve">
+          <source>Open in Internet Explorer</source>
+          <target state="translated">Открыть в Internet Explorer</target>
+        </trans-unit>
         <trans-unit translate="yes" id="Resx/RateApp" xml:space="preserve">
           <source>rate application</source>
           <target state="translated">оценить приложение</target>

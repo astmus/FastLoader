@@ -152,4 +152,7 @@
     <value>about</value>
     <comment>9</comment>
   </data>
+  <data name="OpenInIE" xml:space="preserve">
+    <value>Open in Internet Explorer</value>
+  </data>
 </root>

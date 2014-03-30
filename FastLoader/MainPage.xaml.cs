@@ -20,6 +20,7 @@ using FastLoader.Extensions;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
 using MSPToolkit.Encodings;
+using Microsoft.Phone.Tasks;
 
 namespace FastLoader
 {
@@ -48,7 +49,7 @@ namespace FastLoader
 	public partial class MainPage : PhoneApplicationPage
 	{
 		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/search?q=";
-		const string START_PAGE_NAME = "storagefilestart.html";
+		const string START_PAGE = "storagefilestart.html";
 		// Constructor
 		HttpWebRequest _request;
 		string _currentDomain;
@@ -61,7 +62,7 @@ namespace FastLoader
 		{
 			InitializeComponent();
 			BuildLocalizedApplicationBar();
-			_currentPage = new Uri(START_PAGE_NAME, UriKind.Relative);
+			_currentPage = new Uri(START_PAGE, UriKind.Relative);
 			browser.Navigate(_currentPage);
 		}
 
@@ -119,7 +120,7 @@ namespace FastLoader
 				Dispatcher.BeginInvoke(() =>
 				{
 					progressBar.IsIndeterminate = false;
-					if (_currentPage.OriginalString != START_PAGE_NAME)
+					if (_currentPage.OriginalString != START_PAGE)
 						SetCurrentDomainFromUrl(_currentPage);
 #if DEBUG
 					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString+Environment.NewLine+e.Message);
@@ -260,7 +261,7 @@ namespace FastLoader
 				{
 					// if we step back by history
 					_currentPage = _hystory.Pop();
-					if (_currentPage.OriginalString != START_PAGE_NAME)
+					if (_currentPage.OriginalString != START_PAGE)
 						SetCurrentDomainFromUrl(_currentPage);
 					else
 						_currentDomain = "";
@@ -287,7 +288,7 @@ namespace FastLoader
 				{
 					isf.Remove();
 					_hystory.Clear();
-					_currentPage = new Uri(START_PAGE_NAME, UriKind.Relative);
+					_currentPage = new Uri(START_PAGE, UriKind.Relative);
 					browser.Navigate(_currentPage);
 				}
 			}
@@ -309,6 +310,16 @@ namespace FastLoader
 
 			appBarMenuItem = new ApplicationBarMenuItem(AppResources.About);
 			appBarMenuItem.Click += (object sender, EventArgs e) => { NavigationService.Navigate(new Uri("/AboutPage.xaml", UriKind.Relative)); };
+			ApplicationBar.MenuItems.Add(appBarMenuItem);
+
+			appBarMenuItem = new ApplicationBarMenuItem(AppResources.OpenInIE);
+			appBarMenuItem.Click += (object sender, EventArgs e) => 
+			{
+				if (_currentPage.OriginalString == START_PAGE) return;
+				WebBrowserTask task = new WebBrowserTask();
+				task.Uri = _currentPage;
+				task.Show();
+			};
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
 
 		}
