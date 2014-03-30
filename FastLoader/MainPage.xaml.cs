@@ -20,7 +20,6 @@ using FastLoader.Extensions;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
 using MSPToolkit.Encodings;
-using Microsoft.Phone.Tasks;
 
 namespace FastLoader
 {
@@ -48,7 +47,7 @@ namespace FastLoader
 
 	public partial class MainPage : PhoneApplicationPage
 	{
-		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/m/search?q=";
+		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/search?q=";
 		const string START_PAGE_NAME = "storagefilestart.html";
 		// Constructor
 		HttpWebRequest _request;
@@ -91,15 +90,11 @@ namespace FastLoader
 			if (e.Key == Key.Enter)
 			{
 				Uri outputUri;
-				string enteredString = (sender as TextBox).Text;
-				if (enteredString == "")
-				{
-					this.Focus();
-					return;
-				}
+				string urlAddress = (sender as TextBox).Text;
+				if (urlAddress.IndexOf("http") == -1)
+					urlAddress= "http://" + urlAddress;
 
-				string urlAddress = "http://" + enteredString;
-				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && enteredString.Contains('.'))
+				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && (sender as TextBox).Text.Contains('.'))
 				{
 					SetCurrentDomainFromUrl(outputUri);
 					Navigate(outputUri);
@@ -107,7 +102,7 @@ namespace FastLoader
 				else
 				{
 					SetCurrentDomainFromUrl(new Uri("https://www.google.com",UriKind.Absolute));
-					Search(enteredString);
+					Search((sender as TextBox).Text);
 				}
 			}
 		}
@@ -124,13 +119,18 @@ namespace FastLoader
 				Dispatcher.BeginInvoke(() =>
 				{
 					progressBar.IsIndeterminate = false;
-					SetCurrentDomainFromUrl(_currentPage);
-					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString);
+					if (_currentPage.OriginalString != START_PAGE_NAME)
+						SetCurrentDomainFromUrl(_currentPage);
+#if DEBUG
+					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString+Environment.NewLine+e.Message);
+#else
+					MessageBox.Show(AppResources.ExceptionMessage);
+#endif
 				});
 				return;
 			}
 
-			Stream sourceStream = Utils.CopyAndClose(response.GetResponseStream());
+			Stream sourceStream = Utils.CopyAndClose(response.GetResponseStream(), (int)response.ContentLength);
 			
 			if (response.Headers[HttpRequestHeader.ContentEncoding] == "gzip")
 				sourceStream = new GZipStream(sourceStream, CompressionMode.Decompress);
@@ -193,7 +193,8 @@ namespace FastLoader
 			this.Focus();
 			progressBar.IsIndeterminate = true;
 			_request = WebRequest.CreateHttp(link);
-			
+			_request.AllowReadStreamBuffering = false; 
+			_request.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 			// if it file exists in the storage then load it
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(link.GetLocalHystoryFileName()))
 			{
@@ -303,21 +304,13 @@ namespace FastLoader
 			ApplicationBar.StateChanged += ApplicationBar_StateChanged;
 		    // Create a new menu item with the localized string from AppResources.
 		    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.ClearCacheMenuItem);
-			appBarMenuItem.Click += ClearCacheMenuPressed;			
+			appBarMenuItem.Click += ClearCacheMenuPressed;
 		    ApplicationBar.MenuItems.Add(appBarMenuItem);
-			ApplicationBarMenuItem appBarMenuItem2 = new ApplicationBarMenuItem("OpenInExternalBrowser");
-			appBarMenuItem2.Click += appBarMenuItem2_Click;
-			ApplicationBar.MenuItems.Add(appBarMenuItem2);
-		}
 
-		void appBarMenuItem2_Click(object sender, EventArgs e)
-		{
-			if (_hystory.Count >= 1)
-			{
-				WebBrowserTask wb = new WebBrowserTask();
-				wb.Uri = _currentPage;
-				wb.Show();
-			}			
+			appBarMenuItem = new ApplicationBarMenuItem(AppResources.About);
+			appBarMenuItem.Click += (object sender, EventArgs e) => { NavigationService.Navigate(new Uri("/AboutPage.xaml", UriKind.Relative)); };
+			ApplicationBar.MenuItems.Add(appBarMenuItem);
+
 		}
 
 		private void TextBox_GotFocus(object sender, RoutedEventArgs e)
