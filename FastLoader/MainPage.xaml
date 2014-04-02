@@ -6,6 +6,7 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -15,9 +16,7 @@
     
     <phone:PhoneApplicationPage.Resources>
         <ControlTemplate x:Key="PhoneDisabledTextBoxTemplate" TargetType="TextBox">
-
             <ContentControl x:Name="ContentElement" BorderThickness="0" HorizontalContentAlignment="Stretch" Margin="{StaticResource PhoneTextBoxInnerMargin}" Padding="{TemplateBinding Padding}" VerticalContentAlignment="Stretch"/>
-
         </ControlTemplate>
 
         <Style x:Key="TextBoxLightDarkStyle" TargetType="TextBox">
@@ -131,12 +130,12 @@
 
         <phone:WebBrowser IsScriptEnabled="False" NavigationFailed="browser_NavigationFailed"  Navigated="browser_Navigated" Grid.ColumnSpan="2" Navigating="browser_Navigating"  x:Name="browser" Grid.RowSpan="2" />
         <ProgressBar x:Name="progressBar" Grid.ColumnSpan="2" VerticalAlignment="Bottom" />
-        <TextBox Text="windows phone office протягивание"  Style="{StaticResource TextBoxLightDarkStyle}"   GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"  KeyDown="TextBox_KeyDown" Grid.Row="0"/>
-        <!--<Button Grid.Column="1"  Margin="-12,0,0,0" >
+        <toolkit:AutoCompleteBox Background="White"  TextBoxStyle="{StaticResource TextBoxLightDarkStyle}" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp"  Grid.Row="0"/>
+        <!--<Button Grid.Column="1"  Margin="-12,0,0,0" > Style="{StaticResource TextBoxLightDarkStyle}"
             <Polygon Points="0,5 20,5 10,20"  Fill="White" />
         </Button>-->
         <!--<TextBlock x:Name="progress" Foreground="Red"  Grid.Row="1" FontSize="{StaticResource PhoneFontSizeLarge}"  TextAlignment="Center" VerticalAlignment="Center"   Text="0%" />-->
-        <Border Background="Black" Opacity="1" Grid.ColumnSpan="2"  x:Name="placeholder" Grid.RowSpan="2"/>
+        <Border Background="Black" Opacity="0" Grid.ColumnSpan="2"  x:Name="placeholder" Grid.RowSpan="2"/>
     </Grid>
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar Mode="Minimized" ForegroundColor="{StaticResource PhoneAccentColor}"  StateChanged="ApplicationBar_StateChanged"  Opacity="0"  IsVisible="True" IsMenuEnabled="True">

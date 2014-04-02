@@ -86,16 +86,16 @@ namespace FastLoader
 			}
 		}
 
-		private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+		private void TextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
 		{
 			if (e.Key == Key.Enter)
 			{
 				Uri outputUri;
-				string urlAddress = (sender as TextBox).Text;
+				string urlAddress = (sender as AutoCompleteBox).Text;
 				if (urlAddress.IndexOf("http") == -1)
 					urlAddress= "http://" + urlAddress;
 
-				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && (sender as TextBox).Text.Contains('.'))
+				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && (sender as AutoCompleteBox).Text.Contains('.'))
 				{
 					SetCurrentDomainFromUrl(outputUri);
 					Navigate(outputUri);
@@ -103,7 +103,7 @@ namespace FastLoader
 				else
 				{
 					SetCurrentDomainFromUrl(new Uri("https://www.google.com",UriKind.Absolute));
-					Search((sender as TextBox).Text);
+					Search((sender as AutoCompleteBox).Text);
 				}
 			}
 		}
@@ -173,6 +173,8 @@ namespace FastLoader
 				if (charsetContainsInPage == false)
 					content = content.Insert(content.IndexOf("<head>") + 6, string.Format("<meta content=\"{0}\" http-equiv=\"Content-Type\">", DEFAULT_CONTENT_TYPE));
 
+				if (_currentDomain.Contains("google"))
+					content = Regex.Replace(content, "<form action=\"/search.*form>","");
 
 				RemoveImgTagsFromPage(ref content);
 
