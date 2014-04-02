@@ -17,7 +17,8 @@ namespace FastLoader
 		/// </summary>
 		/// <returns>The root frame of the Phone Application.</returns>
 		public static PhoneApplicationFrame RootFrame { get; private set; }
-
+		public delegate void ApplicationClosingDelegate(object sender, ClosingEventArgs e);
+		public event ApplicationClosingDelegate ApplicationClosing;
 		/// <summary>
 		/// Constructor for the Application object.
 		/// </summary>
@@ -79,6 +80,8 @@ namespace FastLoader
 		// This code will not execute when the application is deactivated
 		private void Application_Closing(object sender, ClosingEventArgs e)
 		{
+			if (ApplicationClosing != null)
+				ApplicationClosing(sender, e);
 		}
 
 		// Code to execute if a navigation fails

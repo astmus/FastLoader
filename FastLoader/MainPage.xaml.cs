@@ -21,6 +21,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Media;
 using MSPToolkit.Encodings;
 using Microsoft.Phone.Tasks;
+using System.Collections.ObjectModel;
 
 namespace FastLoader
 {
@@ -50,12 +51,14 @@ namespace FastLoader
 	{
 		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/search?q=";
 		const string START_PAGE = "storagefilestart.html";
+		const string DEFAULT_CONTENT_TYPE = "text/html; charset=UTF-8"; 
 		// Constructor
 		HttpWebRequest _request;
 		string _currentDomain;
 		//string _currentFileName;
 		Uri _currentPage;
 		Stack<Uri> _hystory = new Stack<Uri>();
+		ObservableCollection<string> _completions = new ObservableCollection<string>();
 		//Stack<DomainPagesCount> _domains = new Stack<DomainPagesCount>();
 		Dictionary<Uri, String> _uriFileNames = new Dictionary<Uri, string>();
 		public MainPage()
@@ -64,12 +67,33 @@ namespace FastLoader
 			BuildLocalizedApplicationBar();
 			_currentPage = new Uri(START_PAGE, UriKind.Relative);
 			browser.Navigate(_currentPage);
+			(App.Current as App).ApplicationClosing += MainPage_ApplicationClosing;
 		}
+
+		void MainPage_ApplicationClosing(object sender, ClosingEventArgs e)
+		{
+			using (IsolatedStorageFileStream file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("completions", FileMode.Create, FileAccess.Write))
+			{
+				StreamWriter writer = new StreamWriter(file);
+				foreach (string item in _completions)
+					writer.WriteLine(item);
+				writer.Close();
+				file.Close();
+			}
+		}	
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
 			base.OnNavigatedTo(e);
-			Scheduler.Dispatcher.Schedule(() => { LayoutRoot.Children.Remove(placeholder); }, TimeSpan.FromMilliseconds(150));
+			//load completions
+			using (IsolatedStorageFileStream file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("completions",FileMode.OpenOrCreate,FileAccess.Read))
+			{
+				StreamReader reader = new StreamReader(file);
+				while (!reader.EndOfStream)
+					_completions.Add(reader.ReadLine());
+			}
+			searchField.ItemsSource = _completions;
+			
 		}
 
 		protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
@@ -86,16 +110,19 @@ namespace FastLoader
 			}
 		}
 
-		private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+		private void TextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
 		{
 			if (e.Key == Key.Enter)
 			{
 				Uri outputUri;
-				string urlAddress = (sender as TextBox).Text;
+				string urlAddress = (sender as AutoCompleteBox).Text;
+				if (_completions.Contains(urlAddress) == false)
+					_completions.Insert(0,urlAddress);
+
 				if (urlAddress.IndexOf("http") == -1)
 					urlAddress= "http://" + urlAddress;
 
-				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && (sender as TextBox).Text.Contains('.'))
+				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && (sender as AutoCompleteBox).Text.Contains('.'))
 				{
 					SetCurrentDomainFromUrl(outputUri);
 					Navigate(outputUri);
@@ -103,7 +130,7 @@ namespace FastLoader
 				else
 				{
 					SetCurrentDomainFromUrl(new Uri("https://www.google.com",UriKind.Absolute));
-					Search((sender as TextBox).Text);
+					Search((sender as AutoCompleteBox).Text);
 				}
 			}
 		}
@@ -143,12 +170,16 @@ namespace FastLoader
 				StreamReader sourceReader = new StreamReader(sourceStream);
 				string content = sourceReader.ReadToEnd();
 				string charset = null;
-
+				bool charsetContainsInPage = true;
 				try
 				{
-					charset = Regex.Match(content, "charset=([^\";']+)").Groups[1].Value;
+					//handle encoding
+					charset = GetCharsetFromContent(content);
 					if (charset == "")
-						content = content.Insert(content.IndexOf("<head>")+6,"<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\">");
+					{
+						charsetContainsInPage = false;
+						charset = GetCharsetFromHeaders(response);
+					}
 				}
 				catch (System.Exception ex)
 				{
@@ -162,8 +193,15 @@ namespace FastLoader
 					sourceStream.Position = 0;
 					StreamReader r = new StreamReader(sourceStream, encoding);
 					content = r.ReadToEnd();
-					content = content.Replace(charset, "utf-8");
+					if (charsetContainsInPage)
+						content = content.Replace(charset, "utf-8");
 				}
+
+				if (charsetContainsInPage == false)
+					content = content.Insert(content.IndexOf("<head>") + 6, string.Format("<meta content=\"{0}\" http-equiv=\"Content-Type\">", DEFAULT_CONTENT_TYPE));
+
+				if (_currentDomain.Contains("google"))
+					content = Regex.Replace(content, "<form action=\"/search.*form>","");
 
 				RemoveImgTagsFromPage(ref content);
 
@@ -178,6 +216,17 @@ namespace FastLoader
 			{
 				browser.Navigate(new Uri(fileName, UriKind.Relative));
 			});
+		}
+
+		string GetCharsetFromContent(string content)
+		{
+			return Regex.Match(content, "<meta.+?charset=([^\";']+)").Groups[1].Value;			
+		}
+
+		string GetCharsetFromHeaders(HttpWebResponse response)
+		{
+			string contentType = response.Headers[HttpRequestHeader.ContentType];
+			return Regex.Match(contentType, "charset=([^\";']+)").Groups[1].Value;			
 		}
 
 		void RemoveImgTagsFromPage(ref string pageContent)
@@ -216,8 +265,11 @@ namespace FastLoader
 			Navigate(uriForSearch);
 		}
 
+		static bool isFirstTime = true;
 		private void browser_Navigated(object sender, NavigationEventArgs e)
 		{
+			if (isFirstTime)
+				Scheduler.Dispatcher.Schedule(() => { LayoutRoot.Children.Remove(placeholder); }, TimeSpan.FromMilliseconds(150));
 			progressBar.IsIndeterminate = false;
 		}
 

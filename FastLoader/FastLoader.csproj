@@ -207,6 +207,9 @@
     <Reference Include="System.IO.Compression">
       <HintPath>packages\Microsoft.Bcl.Compression.3.9.73\lib\wp8\System.IO.Compression.dll</HintPath>
     </Reference>
+	<Reference Include="Microsoft.Phone.Controls.Toolkit">
+      <HintPath>packages\Microsoft.Phone.Controls.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <XliffResource Include="Resources\AppResources.qps-ploc.xlf">
