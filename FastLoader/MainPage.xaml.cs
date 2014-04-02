@@ -49,6 +49,7 @@ namespace FastLoader
 	{
 		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/search?q=";
 		const string START_PAGE_NAME = "storagefilestart.html";
+		const string DEFAULT_CONTENT_TYPE = "text/html; charset=UTF-8"; 
 		// Constructor
 		HttpWebRequest _request;
 		string _currentDomain;
@@ -68,7 +69,7 @@ namespace FastLoader
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
 			base.OnNavigatedTo(e);
-			Scheduler.Dispatcher.Schedule(() => { LayoutRoot.Children.Remove(placeholder); }, TimeSpan.FromMilliseconds(150));
+			
 		}
 
 		protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
@@ -142,12 +143,16 @@ namespace FastLoader
 				StreamReader sourceReader = new StreamReader(sourceStream);
 				string content = sourceReader.ReadToEnd();
 				string charset = null;
-
+				bool charsetContainsInPage = true;
 				try
 				{
-					charset = Regex.Match(content, "charset=([^\";']+)").Groups[1].Value;
+					//handle encoding
+					charset = GetCharsetFromContent(content);
 					if (charset == "")
-						content = content.Insert(content.IndexOf("<head>")+6,"<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\">");
+					{
+						charsetContainsInPage = false;
+						charset = GetCharsetFromHeaders(response);
+					}
 				}
 				catch (System.Exception ex)
 				{
@@ -161,8 +166,13 @@ namespace FastLoader
 					sourceStream.Position = 0;
 					StreamReader r = new StreamReader(sourceStream, encoding);
 					content = r.ReadToEnd();
-					content = content.Replace(charset, "utf-8");
+					if (charsetContainsInPage)
+						content = content.Replace(charset, "utf-8");
 				}
+
+				if (charsetContainsInPage == false)
+					content = content.Insert(content.IndexOf("<head>") + 6, string.Format("<meta content=\"{0}\" http-equiv=\"Content-Type\">", DEFAULT_CONTENT_TYPE));
+
 
 				RemoveImgTagsFromPage(ref content);
 
@@ -177,6 +187,17 @@ namespace FastLoader
 			{
 				browser.Navigate(new Uri(fileName, UriKind.Relative));
 			});
+		}
+
+		string GetCharsetFromContent(string content)
+		{
+			return Regex.Match(content, "<meta.+?charset=([^\";']+)").Groups[1].Value;			
+		}
+
+		string GetCharsetFromHeaders(HttpWebResponse response)
+		{
+			string contentType = response.Headers[HttpRequestHeader.ContentType];
+			return Regex.Match(contentType, "charset=([^\";']+)").Groups[1].Value;			
 		}
 
 		void RemoveImgTagsFromPage(ref string pageContent)
@@ -215,8 +236,11 @@ namespace FastLoader
 			Navigate(uriForSearch);
 		}
 
+		static bool isFirstTime = true;
 		private void browser_Navigated(object sender, NavigationEventArgs e)
 		{
+			if (isFirstTime)
+				Scheduler.Dispatcher.Schedule(() => { LayoutRoot.Children.Remove(placeholder); }, TimeSpan.FromMilliseconds(150));
 			progressBar.IsIndeterminate = false;
 		}
 
