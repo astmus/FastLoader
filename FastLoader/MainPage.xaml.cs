@@ -269,7 +269,11 @@ namespace FastLoader
 		private void browser_Navigated(object sender, NavigationEventArgs e)
 		{
 			if (isFirstTime)
-				Scheduler.Dispatcher.Schedule(() => { LayoutRoot.Children.Remove(placeholder); }, TimeSpan.FromMilliseconds(150));
+				Scheduler.Dispatcher.Schedule(() => 
+				{ 
+					LayoutRoot.Children.Remove(placeholder);
+					ApplicationBar.IsVisible = true;
+				}, TimeSpan.FromMilliseconds(150));
 			progressBar.IsIndeterminate = false;
 		}
 
@@ -350,7 +354,8 @@ namespace FastLoader
 		private void BuildLocalizedApplicationBar()
 		{
 		    // Set the page's ApplicationBar to a new instance of ApplicationBar.
-		    ApplicationBar = new ApplicationBar();			
+		    ApplicationBar = new ApplicationBar();
+			ApplicationBar.IsVisible = false;
 			ApplicationBar.Mode = ApplicationBarMode.Minimized;
 			ApplicationBar.Opacity = 0;
 			ApplicationBar.ForegroundColor = (Color)Application.Current.Resources["PhoneAccentColor"];
@@ -360,8 +365,8 @@ namespace FastLoader
 			appBarMenuItem.Click += ClearCacheMenuPressed;
 		    ApplicationBar.MenuItems.Add(appBarMenuItem);
 
-			appBarMenuItem = new ApplicationBarMenuItem(AppResources.About);
-			appBarMenuItem.Click += (object sender, EventArgs e) => { NavigationService.Navigate(new Uri("/AboutPage.xaml", UriKind.Relative)); };
+			appBarMenuItem = new ApplicationBarMenuItem(AppResources.Refresh);
+			appBarMenuItem.Click += RefreshCurrentPage;
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
 
 			appBarMenuItem = new ApplicationBarMenuItem(AppResources.OpenInIE);
@@ -374,6 +379,19 @@ namespace FastLoader
 			};
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
 
+			appBarMenuItem = new ApplicationBarMenuItem(AppResources.About);
+			appBarMenuItem.Click += (object sender, EventArgs e) => { NavigationService.Navigate(new Uri("/AboutPage.xaml", UriKind.Relative)); };
+			ApplicationBar.MenuItems.Add(appBarMenuItem);
+		}
+
+		void RefreshCurrentPage(object sender, EventArgs e)
+		{
+			string filename = _currentPage.GetLocalHystoryFileName();
+			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(filename))
+			{
+				IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(filename);
+				Navigate(_currentPage);
+			}
 		}
 
 		private void TextBox_GotFocus(object sender, RoutedEventArgs e)
