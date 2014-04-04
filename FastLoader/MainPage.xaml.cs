@@ -171,7 +171,11 @@ namespace FastLoader
 				}
 
 				if (charsetContainsInPage == false)
-					content = content.Insert(content.IndexOf("<head>") + 6, string.Format("<meta content=\"{0}\" http-equiv=\"Content-Type\">", DEFAULT_CONTENT_TYPE));
+				{
+					int pos = content.IndexOf("<head>");
+					if (pos != -1)
+						content = content.Insert(pos + 6, string.Format("<meta content=\"{0}\" http-equiv=\"Content-Type\">", DEFAULT_CONTENT_TYPE));
+				}
 
 				if (_currentDomain.Contains("google"))
 					content = Regex.Replace(content, "<form action=\"/search.*form>","");
