@@ -79,6 +79,15 @@ namespace FastLoader.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This page is not displayed correctly, please correct it..
+        /// </summary>
+        public static string BadPageMessage {
+            get {
+                return ResourceManager.GetString("BadPageMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to clear cache.
         /// </summary>
         public static string ClearCacheMenuItem {
@@ -102,6 +111,15 @@ namespace FastLoader.Resources {
         public static string ExceptionMessage {
             get {
                 return ResourceManager.GetString("ExceptionMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to report about bad page.
+        /// </summary>
+        public static string NoticeAboutBadPage {
+            get {
+                return ResourceManager.GetString("NoticeAboutBadPage", resourceCulture);
             }
         }
         
@@ -147,6 +165,24 @@ namespace FastLoader.Resources {
         public static string ResourceLanguage {
             get {
                 return ResourceManager.GetString("ResourceLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SETTINGS.
+        /// </summary>
+        public static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save list of auto completions.
+        /// </summary>
+        public static string SettingsSaveCompletions {
+            get {
+                return ResourceManager.GetString("SettingsSaveCompletions", resourceCulture);
             }
         }
     }

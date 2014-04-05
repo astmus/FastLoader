@@ -18,12 +18,12 @@
         <note from="MultilingualBuild" annotates="source" priority="2">Controls the Language and ensures that the font for all elements in the RootFrame aligns with the app's language. Set to the language code of this resource file's language.</note></trans-unit>
         <trans-unit id="Resx/ExceptionMessage" translate="yes" xml:space="preserve">
           <source>Sorry, but open the page on this link fails</source>
-          <target state="needs-review-translation" state-qualifier="mt-suggestion">Извините, но открытые страницы по этой ссылке не удается</target>
+          <target state="signed-off" state-qualifier="mt-suggestion">Извините, но открытые страницы по этой ссылке не удается</target>
           
         <note from="MultilingualBuild" annotates="source" priority="2">2</note></trans-unit>
         <trans-unit id="Resx/ClearCacheMessage" translate="yes" xml:space="preserve">
           <source>Clear cache and delete all previously downloaded pages?</source>
-          <target state="needs-review-translation" state-qualifier="mt-suggestion">Очистить кэш и удалить все ранее загруженные страницы?</target>
+          <target state="signed-off" state-qualifier="mt-suggestion">Очистить кэш и удалить все ранее загруженные страницы?</target>
           
         <note from="MultilingualBuild" annotates="source" priority="2">1</note></trans-unit>
         <trans-unit id="Resx/ClearCacheMenuItem" translate="yes" xml:space="preserve">
@@ -33,9 +33,9 @@
         <note from="MultilingualBuild" annotates="source" priority="2">3</note></trans-unit>
         <trans-unit translate="yes" id="Resx/AboutText" xml:space="preserve">
           <source>Fast loading pages from internet and offline viewing.</source>
-          <target state="needs-review-translation">Быстрая загрузка страниц из интернета с последующим просмотром офлайн.</target>
+          <target state="translated">Быстрая загрузка страниц из интернета с последующим просмотром офлайн.</target>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">7</note><note from="MultilingualUpdate" annotates="source" priority="2">Please verify the translation’s accuracy as the source string was updated after it was translated.</note></trans-unit>
+        <note from="MultilingualBuild" annotates="source" priority="2">7</note></trans-unit>
         <trans-unit translate="yes" id="Resx/Refresh" xml:space="preserve">
           <source>Refresh</source>
           <target state="translated">Обновить</target>
@@ -48,6 +48,22 @@
         <trans-unit translate="yes" id="Resx/OpenInIE" xml:space="preserve">
           <source>Open in Internet Explorer</source>
           <target state="translated">Открыть в Internet Explorer</target>
+        </trans-unit>
+        <trans-unit translate="yes" id="Resx/Settings" xml:space="preserve">
+          <source>SETTINGS</source>
+          <target state="translated">НАСТРОЙКИ</target>
+        </trans-unit>
+        <trans-unit translate="yes" id="Resx/SettingsSaveCompletions" xml:space="preserve">
+          <source>Save list of auto completions</source>
+          <target state="translated">Сохранять список автодополнения</target>
+        </trans-unit>
+        <trans-unit translate="yes" id="Resx/BadPageMessage" xml:space="preserve">
+          <source>This page is not displayed correctly, please correct it.</source>
+          <target state="translated">Эта страница отображается неверно, пожалуйста исправьте это.</target>
+        </trans-unit>
+        <trans-unit translate="yes" id="Resx/NoticeAboutBadPage" xml:space="preserve">
+          <source>report about bad page</source>
+          <target state="translated">неправильная страница</target>
         </trans-unit>
         <trans-unit translate="yes" id="Resx/RateApp" xml:space="preserve">
           <source>rate application</source>

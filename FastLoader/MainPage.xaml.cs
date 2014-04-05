@@ -25,28 +25,6 @@ using System.Collections.ObjectModel;
 
 namespace FastLoader
 {
-	//public struct DomainPagesCount
-	//{
-	//	public string Domain;
-	//	public int CountPages;
-
-	//	public DomainPagesCount(string domain, int countPages = 0)
-	//	{
-	//		this.Domain = domain;
-	//		this.CountPages = 0;
-	//	}
-
-	//	public override string ToString()
-	//	{
-	//		return Domain;
-	//	}
-
-	//	public bool IsEmpty()
-	//	{
-	//		return Domain == String.Empty || Domain == null;
-	//	}
-	//}
-
 	public partial class MainPage : PhoneApplicationPage
 	{
 		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/search?q=";
@@ -60,14 +38,23 @@ namespace FastLoader
 		Stack<Uri> _hystory = new Stack<Uri>();
 		ObservableCollection<string> _completions = new ObservableCollection<string>();
 		//Stack<DomainPagesCount> _domains = new Stack<DomainPagesCount>();
-		Dictionary<Uri, String> _uriFileNames = new Dictionary<Uri, string>();
+		//Dictionary<Uri, String> _uriFileNames = new Dictionary<Uri, string>();
 		public MainPage()
 		{
 			InitializeComponent();
 			BuildLocalizedApplicationBar();
+			AppSettings.Instance.SaveAutoCompletionsListValueCahnged += Instance_SaveAutoCompletionsListValueCahnged;
 			_currentPage = new Uri(START_PAGE, UriKind.Relative);
 			browser.Navigate(_currentPage);
 			(App.Current as App).ApplicationClosing += MainPage_ApplicationClosing;
+		}
+
+		void Instance_SaveAutoCompletionsListValueCahnged(bool obj)
+		{
+			if (obj == false)
+				searchField.ItemsSource = null;
+			else
+				searchField.ItemsSource = _completions;
 		}
 
 		void MainPage_ApplicationClosing(object sender, ClosingEventArgs e)
@@ -85,15 +72,21 @@ namespace FastLoader
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
 			base.OnNavigatedTo(e);
+
+			if (e.NavigationMode != NavigationMode.New)
+				return;
 			//load completions
 			using (IsolatedStorageFileStream file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("completions",FileMode.OpenOrCreate,FileAccess.Read))
 			{
 				StreamReader reader = new StreamReader(file);
 				while (!reader.EndOfStream)
 					_completions.Add(reader.ReadLine());
+				reader.Close();
+				file.Close();
 			}
-			searchField.ItemsSource = _completions;
-			
+
+			if (AppSettings.Instance.SaveAutocompletionsList)
+				searchField.ItemsSource = _completions;
 		}
 
 		protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
@@ -116,7 +109,8 @@ namespace FastLoader
 			{
 				Uri outputUri;
 				string urlAddress = (sender as AutoCompleteBox).Text;
-				if (_completions.Contains(urlAddress) == false)
+				
+				if (AppSettings.Instance.SaveAutocompletionsList && _completions.Contains(urlAddress) == false)
 					_completions.Insert(0,urlAddress);
 
 				if (urlAddress.IndexOf("http") == -1)
@@ -190,11 +184,29 @@ namespace FastLoader
 
 				if (encoding != null)
 				{
-					sourceStream.Position = 0;
-					StreamReader r = new StreamReader(sourceStream, encoding);
-					content = r.ReadToEnd();
-					if (charsetContainsInPage)
-						content = content.Replace(charset, "utf-8");
+					try
+					{
+						sourceStream.Position = 0;
+						StreamReader r = new StreamReader(sourceStream, encoding);
+						content = r.ReadToEnd();
+						if (charsetContainsInPage)
+							content = content.Replace(charset, "utf-8");
+					}
+					catch (System.Exception ex)
+					{
+						Dispatcher.BeginInvoke(() =>
+						{
+							progressBar.IsIndeterminate = false;
+							if (_currentPage.OriginalString != START_PAGE)
+								SetCurrentDomainFromUrl(_currentPage);
+#if DEBUG
+					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString+Environment.NewLine+e.Message);
+#else
+							MessageBox.Show(AppResources.ExceptionMessage);
+#endif
+						});
+						return;
+					}					
 				}
 
 				if (charsetContainsInPage == false)
@@ -383,9 +395,25 @@ namespace FastLoader
 			};
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
 
-			appBarMenuItem = new ApplicationBarMenuItem(AppResources.About);
-			appBarMenuItem.Click += (object sender, EventArgs e) => { NavigationService.Navigate(new Uri("/AboutPage.xaml", UriKind.Relative)); };
+			appBarMenuItem = new ApplicationBarMenuItem(AppResources.NoticeAboutBadPage);
+			appBarMenuItem.Click += NoticeAboutBadPage;
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
+
+			appBarMenuItem = new ApplicationBarMenuItem(AppResources.Settings);
+			appBarMenuItem.Click += (object sender, EventArgs e) => { NavigationService.Navigate(new Uri("/Settings.xaml", UriKind.Relative)); };
+			ApplicationBar.MenuItems.Add(appBarMenuItem);
+		}
+
+		void NoticeAboutBadPage(object sender, EventArgs e)
+		{
+			if (_currentPage.OriginalString == START_PAGE)
+				return;
+
+			EmailComposeTask email = new EmailComposeTask();
+			email.Body = AppResources.BadPageMessage + Environment.NewLine + _currentPage.OriginalString;
+			email.To = "astmus@live.com";
+			email.Subject = "fast loader report";
+			email.Show();
 		}
 
 		void RefreshCurrentPage(object sender, EventArgs e)

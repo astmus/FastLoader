@@ -5,6 +5,7 @@
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:app="clr-namespace:FastLoader"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -21,11 +22,17 @@
         </Grid.RowDefinitions>
 
         <!--TitlePanel contains the name of the application and page title-->
+        
         <StackPanel Grid.Row="0" Margin="12,17,0,28">
-            <TextBlock Text="{Binding Path=LocalizedResources.About, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock Text="{Binding Path=LocalizedResources.Settings, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>
             <ScrollViewer >
                 <StackPanel>
-                    <StackPanel Margin="12,17,0,28">
+                    <CheckBox IsChecked="{Binding SaveAutocompletionsList, Mode=TwoWay}"  Content="{Binding Path=LocalizedResources.SettingsSaveCompletions, Source={StaticResource LocalizedStrings}}">
+                        
+                    </CheckBox>
+                    <TextBlock Margin="12,13,0,0" Text="{Binding Path=LocalizedResources.About, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>
+                        
+                    <StackPanel Margin="20,0,0,28">                       
                     <TextBlock x:Name="appName"  Text="Fast Loader"/>
                         <TextBlock x:Name="aboutText" TextWrapping="Wrap"  Text="{Binding Path=LocalizedResources.AboutText, Source={StaticResource LocalizedStrings}}"/>
                     </StackPanel>

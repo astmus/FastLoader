@@ -130,7 +130,7 @@
 
         <phone:WebBrowser IsScriptEnabled="False" NavigationFailed="browser_NavigationFailed"  Navigated="browser_Navigated" Grid.ColumnSpan="2" Navigating="browser_Navigating"  x:Name="browser" Grid.RowSpan="2" />
         <ProgressBar x:Name="progressBar" Grid.ColumnSpan="2" VerticalAlignment="Bottom" />
-        <toolkit:AutoCompleteBox  FilterMode="StartsWith"  x:Name="searchField"  Background="White"  TextBoxStyle="{StaticResource TextBoxLightDarkStyle}" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp"  Grid.Row="0"/>
+        <toolkit:AutoCompleteBox FilterMode="StartsWith"  x:Name="searchField"  Background="White"  TextBoxStyle="{StaticResource TextBoxLightDarkStyle}" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp"  Grid.Row="0"/>
         <!--<Button Grid.Column="1"  Margin="-12,0,0,0" > Style="{StaticResource TextBoxLightDarkStyle}"
             <Polygon Points="0,5 20,5 10,20"  Fill="White" />
         </Button>-->

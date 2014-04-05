@@ -49,6 +49,22 @@
           <source>Open in Internet Explorer</source>
           <target state="new">Open in Internet Explorer</target>
         </trans-unit>
+        <trans-unit translate="yes" id="Resx/Settings" xml:space="preserve">
+          <source>SETTINGS</source>
+          <target state="new">SETTINGS</target>
+        </trans-unit>
+        <trans-unit translate="yes" id="Resx/SettingsSaveCompletions" xml:space="preserve">
+          <source>Save list of auto completions</source>
+          <target state="new">Save list of auto completions</target>
+        </trans-unit>
+        <trans-unit translate="yes" id="Resx/BadPageMessage" xml:space="preserve">
+          <source>This page is not displayed correctly, please correct it.</source>
+          <target state="new">This page is not displayed correctly, please correct it.</target>
+        </trans-unit>
+        <trans-unit translate="yes" id="Resx/NoticeAboutBadPage" xml:space="preserve">
+          <source>report about bad page</source>
+          <target state="new">report about bad page</target>
+        </trans-unit>
         <trans-unit translate="yes" id="Resx/RateApp" xml:space="preserve">
           <source>rate application</source>
           <target state="needs-review-translation" state-qualifier="mt-suggestion">[BB6D4][!!_ŕâτę ãррļįčáťíóη_!!!!]</target>

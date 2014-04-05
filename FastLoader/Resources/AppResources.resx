@@ -155,4 +155,16 @@
   <data name="OpenInIE" xml:space="preserve">
     <value>Open in Internet Explorer</value>
   </data>
+  <data name="Settings" xml:space="preserve">
+    <value>SETTINGS</value>
+  </data>
+  <data name="SettingsSaveCompletions" xml:space="preserve">
+    <value>Save list of auto completions</value>
+  </data>
+  <data name="BadPageMessage" xml:space="preserve">
+    <value>This page is not displayed correctly, please correct it.</value>
+  </data>
+  <data name="NoticeAboutBadPage" xml:space="preserve">
+    <value>report about bad page</value>
+  </data>
 </root>
