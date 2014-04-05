@@ -135,8 +135,8 @@
             <Polygon Points="0,5 20,5 10,20"  Fill="White" />
         </Button>-->
         <!--<TextBlock x:Name="progress" Foreground="Red"  Grid.Row="1" FontSize="{StaticResource PhoneFontSizeLarge}"  TextAlignment="Center" VerticalAlignment="Center"   Text="0%" />-->
-        <Border Background="Black" Opacity="1" Grid.ColumnSpan="2"  x:Name="placeholder" Grid.RowSpan="2">
-            <Image Source="Splash.png" />
+        <Border Background="Black" Margin="0,-30,0,0"  Opacity="1" Grid.ColumnSpan="2"  x:Name="placeholder" Grid.RowSpan="2">
+            <Image Source="Assets\Splash.png" />
         </Border>
     </Grid>
     <phone:PhoneApplicationPage.ApplicationBar>

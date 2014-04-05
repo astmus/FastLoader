@@ -277,7 +277,7 @@ namespace FastLoader
 				{ 
 					LayoutRoot.Children.Remove(placeholder);
 					ApplicationBar.IsVisible = true;
-				}, TimeSpan.FromMilliseconds(150));
+				}, TimeSpan.FromMilliseconds(500));
 			progressBar.IsIndeterminate = false;
 		}
 
@@ -336,7 +336,7 @@ namespace FastLoader
 
 		private void ApplicationBar_StateChanged(object sender, ApplicationBarStateChangedEventArgs e)
 		{
-			(sender as ApplicationBar).Opacity = e.IsMenuVisible ? 0.85 : 0;
+			(sender as ApplicationBar).Opacity = e.IsMenuVisible ? 0.95 : 0;
 		}
 
 		private void ClearCacheMenuPressed(object sender, EventArgs e)
