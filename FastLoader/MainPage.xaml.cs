@@ -22,6 +22,7 @@ using System.Windows.Media;
 using MSPToolkit.Encodings;
 using Microsoft.Phone.Tasks;
 using System.Collections.ObjectModel;
+using FastLoader.Classes;
 
 namespace FastLoader
 {
@@ -31,7 +32,7 @@ namespace FastLoader
 		const string START_PAGE = "storagefilestart.html";
 		const string DEFAULT_CONTENT_TYPE = "text/html; charset=UTF-8";
 		// Constructor
-		HttpWebRequest _request;
+		HttpWebRequestIndicate _request;
 		string _currentDomain;
 		//string _currentFileName;
 		Uri _currentPage;
@@ -42,7 +43,7 @@ namespace FastLoader
 		public MainPage()
 		{
 			InitializeComponent();
-			BuildLocalizedApplicationBar();			
+			BuildLocalizedApplicationBar();
 			PhoneApplicationService.Current.Closing += MainPage_ApplicationClosing;
 			PhoneApplicationService.Current.Activated += Current_Activated;
 			PhoneApplicationService.Current.Deactivated += Current_Deactivated;
@@ -53,14 +54,14 @@ namespace FastLoader
 
 		void Current_Deactivated(object sender, DeactivatedEventArgs e)
 		{
-			if (_request != null)
+			if (_request.IsPerformed)
 				_request.Abort();
 		}
 
 		void Current_Activated(object sender, ActivatedEventArgs e)
 		{
-			if (_request != null)
-				Navigate(_request.RequestUri);
+			if (_request.IsPerformed)
+				Navigate(_request.HttpRequest.RequestUri);
 		}
 
 		void Instance_SaveAutoCompletionsListValueCahnged(bool obj)
@@ -85,7 +86,7 @@ namespace FastLoader
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
-			base.OnNavigatedTo(e);			
+			base.OnNavigatedTo(e);
 
 			if (e.NavigationMode != NavigationMode.New)
 				return;
@@ -106,9 +107,11 @@ namespace FastLoader
 		protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
 		{
 			base.OnBackKeyPress(e);
-			if (_request != null)
-			{
-				_request.Abort();
+			if (_request.IsPerformed)
+			{				
+				_request.Abort();				
+				progressBar.IsIndeterminate = false;
+				e.Cancel = true;
 				return;
 			}
 
@@ -156,14 +159,11 @@ namespace FastLoader
 			{
 				response = (HttpWebResponse)_request.EndGetResponse(result);
 			}
-			catch (Exception e)
+			catch (WebException e)
 			{
-				if (e is WebException)
-				{
-					WebException ex = e as WebException;
-					if (ex.Status == WebExceptionStatus.RequestCanceled)
-						return;
-				}
+				WebException ex = e as WebException;
+				if (ex.Status == WebExceptionStatus.RequestCanceled)
+					return;
 
 				Dispatcher.BeginInvoke(() =>
 				{
@@ -171,7 +171,7 @@ namespace FastLoader
 					if (_currentPage.OriginalString != START_PAGE)
 						SetCurrentDomainFromUrl(_currentPage);
 #if DEBUG
-					MessageBox.Show(AppResources.ExceptionMessage + Environment.NewLine + _request.RequestUri.OriginalString + Environment.NewLine + e.Message);
+					MessageBox.Show(AppResources.ExceptionMessage + Environment.NewLine + _request.HttpRequest.RequestUri.OriginalString + Environment.NewLine + e.Message);
 #else
 					MessageBox.Show(AppResources.ExceptionMessage);
 #endif
@@ -180,12 +180,12 @@ namespace FastLoader
 			}
 
 			Stream sourceStream = Utils.CopyAndClose(response.GetResponseStream(), (int)response.ContentLength);
-			
+
 			if (response.Headers[HttpRequestHeader.ContentEncoding] == "gzip")
 				sourceStream = new GZipStream(sourceStream, CompressionMode.Decompress);
 
-			string fileName = _request.RequestUri.GetLocalHystoryFileName();
-			_request = null;
+			string fileName = _request.HttpRequest.RequestUri.GetLocalHystoryFileName();
+			_request.IsPerformed = false;
 			StreamReader sourceReader = new StreamReader(sourceStream);
 			string content = sourceReader.ReadToEnd();
 			string charset = null;
@@ -225,7 +225,7 @@ namespace FastLoader
 						if (_currentPage.OriginalString != START_PAGE)
 							SetCurrentDomainFromUrl(_currentPage);
 #if DEBUG
-						MessageBox.Show(AppResources.ExceptionMessage + Environment.NewLine + _request.RequestUri.OriginalString + Environment.NewLine + ex.Message);
+						MessageBox.Show(AppResources.ExceptionMessage + Environment.NewLine + _request.HttpRequest.RequestUri.OriginalString + Environment.NewLine + ex.Message);
 #else
 							MessageBox.Show(AppResources.ExceptionMessage);
 #endif
@@ -285,10 +285,11 @@ namespace FastLoader
 		{
 			this.Focus();
 			progressBar.IsIndeterminate = true;
-			_request = WebRequest.CreateHttp(link);
-			_request.AllowAutoRedirect = true;
-			_request.AllowReadStreamBuffering = false;
-			_request.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
+			_request = new HttpWebRequestIndicate(WebRequest.CreateHttp(link));
+			_request.HttpRequest.AllowAutoRedirect = true;
+			_request.HttpRequest.AllowReadStreamBuffering = false;
+			_request.HttpRequest.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
+
 			// if it file exists in the storage then load it
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(link.GetLocalHystoryFileName()))
 			{
@@ -338,7 +339,10 @@ namespace FastLoader
 				{
 					string clearUri = e.Uri.OriginalString.Remove(0, e.Uri.OriginalString.IndexOf("http"));
 					uriForNavigate = new Uri(HttpUtility.UrlDecode(clearUri), UriKind.Absolute);
-					if (_currentDomain.Contains("google"))
+					if (uriForNavigate.OriginalString.Contains("ei") &&
+						uriForNavigate.OriginalString.Contains("sa") &&
+						uriForNavigate.OriginalString.Contains("ved") &&
+						uriForNavigate.OriginalString.Contains("usg"))
 						uriForNavigate = uriForNavigate.RemoveQueryParams("ei", "sa", "ved", "usg");
 					SetCurrentDomainFromUrl(uriForNavigate);
 				}
@@ -355,7 +359,7 @@ namespace FastLoader
 				{
 					// if we navigating to new loaded page
 					_hystory.Push(_currentPage);
-					_currentPage = _request.RequestUri;
+					_currentPage = _request.HttpRequest.RequestUri;
 				}
 				else
 				{
