@@ -6,7 +6,7 @@
     <Language code="ru-RU" />
     <Language code="uk-UA" />
   </Languages>
-  <App xmlns="" ProductID="{a1d660f4-df06-4425-964b-5ca57876872f}" Title="Fast Loader" RuntimeType="Silverlight" Version="1.0.0.11" Genre="apps.normal" Author="Astmus" Description="In case your internet connection is slow but you need just text information, Fast Loader will help you get it really fast. While searching neccessary information you should not &#xD;&#xA;wait for the pictures and additional styles to download. Only text informatio" Publisher="Astmus" PublisherID="{bfd6d05a-d76a-4091-9221-ff23728bfe37}">
+  <App xmlns="" ProductID="{a1d660f4-df06-4425-964b-5ca57876872f}" Title="Fast Loader" RuntimeType="Silverlight" Version="1.0.3.14" Genre="apps.normal" Author="Astmus" Description="In case your internet connection is slow but you need just text information, Fast Loader will help you get it really fast. While searching neccessary information you should not &#xD;&#xA;wait for the pictures and additional styles to download. Only text informatio" Publisher="Astmus" PublisherID="{bfd6d05a-d76a-4091-9221-ff23728bfe37}">
     <IconPath IsRelative="true" IsResource="false">Assets\ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />

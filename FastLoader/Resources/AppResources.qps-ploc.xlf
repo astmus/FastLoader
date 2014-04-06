@@ -33,9 +33,9 @@
         <note from="MultilingualBuild" annotates="source" priority="2">3</note></trans-unit>
         <trans-unit translate="yes" id="Resx/AboutText" xml:space="preserve">
           <source>Fast loading pages from internet and offline viewing.</source>
-          <target state="needs-review-translation">Fast loading pages from internet and offline viewing.</target>
+          <target state="translated">Fast loading pages from internet and offline viewing.</target>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">7</note><note from="MultilingualUpdate" annotates="source" priority="2">Please verify the translation’s accuracy as the source string was updated after it was translated.</note></trans-unit>
+        <note from="MultilingualBuild" annotates="source" priority="2">7</note></trans-unit>
         <trans-unit translate="yes" id="Resx/Refresh" xml:space="preserve">
           <source>Refresh</source>
           <target state="needs-review-translation" state-qualifier="mt-suggestion">[BEBE2][!!_Ŕéƒřèŝћ_!!]</target>
@@ -43,8 +43,8 @@
         <trans-unit translate="yes" id="Resx/About" xml:space="preserve">
           <source>about</source>
           <target state="new">about</target>
-          <note from="MultilingualBuild" annotates="source" priority="2">9</note>
-        </trans-unit>
+          
+        <note from="MultilingualBuild" annotates="source" priority="2">9</note></trans-unit>
         <trans-unit translate="yes" id="Resx/OpenInIE" xml:space="preserve">
           <source>Open in Internet Explorer</source>
           <target state="new">Open in Internet Explorer</target>

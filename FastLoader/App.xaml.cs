@@ -16,9 +16,12 @@ namespace FastLoader
 		/// Provides easy access to the root frame of the Phone Application.
 		/// </summary>
 		/// <returns>The root frame of the Phone Application.</returns>
-		public static PhoneApplicationFrame RootFrame { get; private set; }
-		public delegate void ApplicationClosingDelegate(object sender, ClosingEventArgs e);
-		public event ApplicationClosingDelegate ApplicationClosing;
+		public static PhoneApplicationFrame RootFrame
+		{
+			get;
+			private set;
+		}
+
 		/// <summary>
 		/// Constructor for the Application object.
 		/// </summary>
@@ -36,6 +39,7 @@ namespace FastLoader
 			// Language display initialization
 			InitializeLanguage();
 
+			
 			// Show graphics profiling information while debugging.
 			if (Debugger.IsAttached)
 			{
@@ -80,8 +84,7 @@ namespace FastLoader
 		// This code will not execute when the application is deactivated
 		private void Application_Closing(object sender, ClosingEventArgs e)
 		{
-			if (ApplicationClosing != null)
-				ApplicationClosing(sender, e);
+			
 		}
 
 		// Code to execute if a navigation fails

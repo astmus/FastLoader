@@ -29,7 +29,7 @@ namespace FastLoader
 	{
 		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/search?q=";
 		const string START_PAGE = "storagefilestart.html";
-		const string DEFAULT_CONTENT_TYPE = "text/html; charset=UTF-8"; 
+		const string DEFAULT_CONTENT_TYPE = "text/html; charset=UTF-8";
 		// Constructor
 		HttpWebRequest _request;
 		string _currentDomain;
@@ -42,11 +42,25 @@ namespace FastLoader
 		public MainPage()
 		{
 			InitializeComponent();
-			BuildLocalizedApplicationBar();
+			BuildLocalizedApplicationBar();			
+			PhoneApplicationService.Current.Closing += MainPage_ApplicationClosing;
+			PhoneApplicationService.Current.Activated += Current_Activated;
+			PhoneApplicationService.Current.Deactivated += Current_Deactivated;
 			AppSettings.Instance.SaveAutoCompletionsListValueCahnged += Instance_SaveAutoCompletionsListValueCahnged;
 			_currentPage = new Uri(START_PAGE, UriKind.Relative);
 			browser.Navigate(_currentPage);
-			(App.Current as App).ApplicationClosing += MainPage_ApplicationClosing;
+		}
+
+		void Current_Deactivated(object sender, DeactivatedEventArgs e)
+		{
+			if (_request != null)
+				_request.Abort();
+		}
+
+		void Current_Activated(object sender, ActivatedEventArgs e)
+		{
+			if (_request != null)
+				Navigate(_request.RequestUri);
 		}
 
 		void Instance_SaveAutoCompletionsListValueCahnged(bool obj)
@@ -67,16 +81,16 @@ namespace FastLoader
 				writer.Close();
 				file.Close();
 			}
-		}	
+		}
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
-			base.OnNavigatedTo(e);
+			base.OnNavigatedTo(e);			
 
 			if (e.NavigationMode != NavigationMode.New)
 				return;
 			//load completions
-			using (IsolatedStorageFileStream file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("completions",FileMode.OpenOrCreate,FileAccess.Read))
+			using (IsolatedStorageFileStream file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("completions", FileMode.OpenOrCreate, FileAccess.Read))
 			{
 				StreamReader reader = new StreamReader(file);
 				while (!reader.EndOfStream)
@@ -92,6 +106,12 @@ namespace FastLoader
 		protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
 		{
 			base.OnBackKeyPress(e);
+			if (_request != null)
+			{
+				_request.Abort();
+				return;
+			}
+
 			if (_hystory.Count > 0)
 			{
 				e.Cancel = true;
@@ -109,12 +129,12 @@ namespace FastLoader
 			{
 				Uri outputUri;
 				string urlAddress = (sender as AutoCompleteBox).Text;
-				
+
 				if (AppSettings.Instance.SaveAutocompletionsList && _completions.Contains(urlAddress) == false)
-					_completions.Insert(0,urlAddress);
+					_completions.Insert(0, urlAddress);
 
 				if (urlAddress.IndexOf("http") == -1)
-					urlAddress= "http://" + urlAddress;
+					urlAddress = "http://" + urlAddress;
 
 				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && (sender as AutoCompleteBox).Text.Contains('.'))
 				{
@@ -123,7 +143,7 @@ namespace FastLoader
 				}
 				else
 				{
-					SetCurrentDomainFromUrl(new Uri("https://www.google.com",UriKind.Absolute));
+					SetCurrentDomainFromUrl(new Uri("https://www.google.com", UriKind.Absolute));
 					Search((sender as AutoCompleteBox).Text);
 				}
 			}
@@ -138,13 +158,20 @@ namespace FastLoader
 			}
 			catch (Exception e)
 			{
+				if (e is WebException)
+				{
+					WebException ex = e as WebException;
+					if (ex.Status == WebExceptionStatus.RequestCanceled)
+						return;
+				}
+
 				Dispatcher.BeginInvoke(() =>
 				{
 					progressBar.IsIndeterminate = false;
 					if (_currentPage.OriginalString != START_PAGE)
 						SetCurrentDomainFromUrl(_currentPage);
 #if DEBUG
-					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString+Environment.NewLine+e.Message);
+					MessageBox.Show(AppResources.ExceptionMessage + Environment.NewLine + _request.RequestUri.OriginalString + Environment.NewLine + e.Message);
 #else
 					MessageBox.Show(AppResources.ExceptionMessage);
 #endif
@@ -158,72 +185,72 @@ namespace FastLoader
 				sourceStream = new GZipStream(sourceStream, CompressionMode.Decompress);
 
 			string fileName = _request.RequestUri.GetLocalHystoryFileName();
+			_request = null;
+			StreamReader sourceReader = new StreamReader(sourceStream);
+			string content = sourceReader.ReadToEnd();
+			string charset = null;
+			bool charsetContainsInPage = true;
+			try
+			{
+				//handle encoding
+				charset = GetCharsetFromContent(content);
+				if (charset == "")
+				{
+					charsetContainsInPage = false;
+					charset = GetCharsetFromHeaders(response);
+				}
+			}
+			catch (System.Exception ex)
+			{
+				MessageBox.Show("parse charset error");
+			}
 
-			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(fileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
-			{				
-				StreamReader sourceReader = new StreamReader(sourceStream);
-				string content = sourceReader.ReadToEnd();
-				string charset = null;
-				bool charsetContainsInPage = true;
+			Encoding encoding = Utils.GetEncodingByString(charset);
+
+			if (encoding != null)
+			{
 				try
 				{
-					//handle encoding
-					charset = GetCharsetFromContent(content);
-					if (charset == "")
-					{
-						charsetContainsInPage = false;
-						charset = GetCharsetFromHeaders(response);
-					}
+					sourceStream.Position = 0;
+					StreamReader r = new StreamReader(sourceStream, encoding);
+					content = r.ReadToEnd();
+					if (charsetContainsInPage)
+						content = content.Replace(charset, "utf-8");
 				}
 				catch (System.Exception ex)
 				{
-					MessageBox.Show("parse charset error");
-				}
-		
-				Encoding encoding = Utils.GetEncodingByString(charset);
-
-				if (encoding != null)
-				{
-					try
+					Dispatcher.BeginInvoke(() =>
 					{
-						sourceStream.Position = 0;
-						StreamReader r = new StreamReader(sourceStream, encoding);
-						content = r.ReadToEnd();
-						if (charsetContainsInPage)
-							content = content.Replace(charset, "utf-8");
-					}
-					catch (System.Exception ex)
-					{
-						Dispatcher.BeginInvoke(() =>
-						{
-							progressBar.IsIndeterminate = false;
-							if (_currentPage.OriginalString != START_PAGE)
-								SetCurrentDomainFromUrl(_currentPage);
+						progressBar.IsIndeterminate = false;
+						if (_currentPage.OriginalString != START_PAGE)
+							SetCurrentDomainFromUrl(_currentPage);
 #if DEBUG
-					MessageBox.Show(AppResources.ExceptionMessage+Environment.NewLine+_request.RequestUri.OriginalString+Environment.NewLine+e.Message);
+						MessageBox.Show(AppResources.ExceptionMessage + Environment.NewLine + _request.RequestUri.OriginalString + Environment.NewLine + ex.Message);
 #else
 							MessageBox.Show(AppResources.ExceptionMessage);
 #endif
-						});
-						return;
-					}					
+					});
+					return;
 				}
+			}
 
-				if (charsetContainsInPage == false)
-				{
-					int pos = content.IndexOf("<head>");
-					if (pos != -1)
-						content = content.Insert(pos + 6, string.Format("<meta content=\"{0}\" http-equiv=\"Content-Type\">", DEFAULT_CONTENT_TYPE));
-				}
+			if (charsetContainsInPage == false)
+			{
+				int pos = content.IndexOf("<head>");
+				if (pos != -1)
+					content = content.Insert(pos + 6, string.Format("<meta content=\"{0}\" http-equiv=\"Content-Type\">", DEFAULT_CONTENT_TYPE));
+			}
 
-				if (_currentDomain.Contains("google"))
-					content = Regex.Replace(content, "<form action=\"/search.*form>","");
+			if (_currentDomain.Contains("google"))
+				content = Regex.Replace(content, "<form action=\"/search.*form>", "");
 
-				RemoveImgTagsFromPage(ref content);
+			RemoveImgTagsFromPage(ref content);
 
+			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(fileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
+			{
 				StreamWriter sw = new StreamWriter(savefilestr);
 				sw.Write(content);
-				savefilestr.Close();		
+				savefilestr.Close();
 			}
 
 			sourceStream.Dispose();
@@ -236,17 +263,17 @@ namespace FastLoader
 
 		string GetCharsetFromContent(string content)
 		{
-			return Regex.Match(content, "<meta.+?charset=([^\";']+)").Groups[1].Value;			
+			return Regex.Match(content, "<meta.+?charset=([^\";']+)").Groups[1].Value;
 		}
 
 		string GetCharsetFromHeaders(HttpWebResponse response)
 		{
 			string contentType = response.Headers[HttpRequestHeader.ContentType];
-			return Regex.Match(contentType, "charset=([^\";']+)").Groups[1].Value;			
+			return Regex.Match(contentType, "charset=([^\";']+)").Groups[1].Value;
 		}
 
 		void RemoveImgTagsFromPage(ref string pageContent)
-		{				
+		{
 			pageContent = Regex.Replace(pageContent, "</?(?i:img)(.|\n)*?>", "");
 		}
 
@@ -259,7 +286,8 @@ namespace FastLoader
 			this.Focus();
 			progressBar.IsIndeterminate = true;
 			_request = WebRequest.CreateHttp(link);
-			_request.AllowReadStreamBuffering = false; 
+			_request.AllowAutoRedirect = true;
+			_request.AllowReadStreamBuffering = false;
 			_request.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 			// if it file exists in the storage then load it
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(link.GetLocalHystoryFileName()))
@@ -285,8 +313,8 @@ namespace FastLoader
 		private void browser_Navigated(object sender, NavigationEventArgs e)
 		{
 			if (isFirstTime)
-				Scheduler.Dispatcher.Schedule(() => 
-				{ 
+				Scheduler.Dispatcher.Schedule(() =>
+				{
 					LayoutRoot.Children.Remove(placeholder);
 					ApplicationBar.IsVisible = true;
 				}, TimeSpan.FromMilliseconds(500));
@@ -340,7 +368,7 @@ namespace FastLoader
 				}
 			}
 		}
-		
+
 		void SetCurrentDomainFromUrl(Uri navigateUrl)
 		{
 			_currentDomain = navigateUrl.Scheme + "://" + navigateUrl.Host;
@@ -354,7 +382,7 @@ namespace FastLoader
 		private void ClearCacheMenuPressed(object sender, EventArgs e)
 		{
 			long size = IsolatedStorageFile.GetUserStoreForApplication().GetCurretnSize();
-			if (MessageBox.Show(AppResources.ClearCacheMessage + " ( " + Utils.ConvertCountBytesToString(size) + " )","",MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+			if (MessageBox.Show(AppResources.ClearCacheMessage + " ( " + Utils.ConvertCountBytesToString(size) + " )", "", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
 			{
 				using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
 				{
@@ -364,29 +392,29 @@ namespace FastLoader
 					browser.Navigate(_currentPage);
 				}
 			}
-		}	
+		}
 
 		// Sample code for building a localized ApplicationBar
 		private void BuildLocalizedApplicationBar()
 		{
-		    // Set the page's ApplicationBar to a new instance of ApplicationBar.
-		    ApplicationBar = new ApplicationBar();
+			// Set the page's ApplicationBar to a new instance of ApplicationBar.
+			ApplicationBar = new ApplicationBar();
 			ApplicationBar.IsVisible = false;
 			ApplicationBar.Mode = ApplicationBarMode.Minimized;
 			ApplicationBar.Opacity = 0;
 			ApplicationBar.ForegroundColor = (Color)Application.Current.Resources["PhoneAccentColor"];
 			ApplicationBar.StateChanged += ApplicationBar_StateChanged;
-		    // Create a new menu item with the localized string from AppResources.
-		    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.ClearCacheMenuItem);
+			// Create a new menu item with the localized string from AppResources.
+			ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.ClearCacheMenuItem);
 			appBarMenuItem.Click += ClearCacheMenuPressed;
-		    ApplicationBar.MenuItems.Add(appBarMenuItem);
+			ApplicationBar.MenuItems.Add(appBarMenuItem);
 
 			appBarMenuItem = new ApplicationBarMenuItem(AppResources.Refresh);
 			appBarMenuItem.Click += RefreshCurrentPage;
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
 
 			appBarMenuItem = new ApplicationBarMenuItem(AppResources.OpenInIE);
-			appBarMenuItem.Click += (object sender, EventArgs e) => 
+			appBarMenuItem.Click += (object sender, EventArgs e) =>
 			{
 				if (_currentPage.OriginalString == START_PAGE) return;
 				WebBrowserTask task = new WebBrowserTask();
