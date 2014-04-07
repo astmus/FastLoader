@@ -54,13 +54,13 @@ namespace FastLoader
 
 		void Current_Deactivated(object sender, DeactivatedEventArgs e)
 		{
-			if (_request.IsPerformed)
+			if (_request != null && _request.IsPerformed)
 				_request.Abort();
 		}
 
 		void Current_Activated(object sender, ActivatedEventArgs e)
 		{
-			if (_request.IsPerformed)
+			if (_request != null && _request.IsPerformed)
 				Navigate(_request.HttpRequest.RequestUri);
 		}
 
@@ -347,7 +347,11 @@ namespace FastLoader
 					SetCurrentDomainFromUrl(uriForNavigate);
 				}
 				else
-					uriForNavigate = new Uri(HttpUtility.UrlDecode(_currentDomain + "/" + e.Uri.OriginalString), UriKind.Absolute);
+				{
+					//need testing if will be problems then return _currentDomain + "/" + e.Uri.OriginalString
+					string s = _currentDomain + e.Uri.OriginalString;
+					uriForNavigate = new Uri(HttpUtility.UrlDecode(s), UriKind.Absolute);
+				}
 
 				Navigate(uriForNavigate);
 			}
