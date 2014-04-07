@@ -286,7 +286,6 @@ namespace FastLoader
 			this.Focus();
 			progressBar.IsIndeterminate = true;
 			_request = new HttpWebRequestIndicate(WebRequest.CreateHttp(link));
-			_request.HttpRequest.AllowAutoRedirect = true;
 			_request.HttpRequest.AllowReadStreamBuffering = false;
 			_request.HttpRequest.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 
@@ -347,9 +346,10 @@ namespace FastLoader
 					SetCurrentDomainFromUrl(uriForNavigate);
 				}
 				else
-				{
-					//need testing if will be problems then return _currentDomain + "/" + e.Uri.OriginalString
-					string s = _currentDomain + e.Uri.OriginalString;
+				{					
+					string s = _currentDomain + "/" + e.Uri.OriginalString;
+					if (s.Contains("//"))
+						s = s.Replace("//", "/");
 					uriForNavigate = new Uri(HttpUtility.UrlDecode(s), UriKind.Absolute);
 				}
 
