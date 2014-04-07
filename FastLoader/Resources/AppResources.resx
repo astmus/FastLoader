@@ -167,4 +167,7 @@
   <data name="NoticeAboutBadPage" xml:space="preserve">
     <value>report about bad page</value>
   </data>
+  <data name="History" xml:space="preserve">
+    <value>History</value>
+  </data>
 </root>

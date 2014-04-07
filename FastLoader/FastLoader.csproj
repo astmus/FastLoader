@@ -94,6 +94,16 @@
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
     <Compile Include="Classes\HttpWebRequestIndicate.cs" />
+    <Compile Include="Data\AllPeople.cs" />
+    <Compile Include="Data\HistoryItem.cs" />
+    <Compile Include="Data\HistoryItemsByDate.cs" />
+    <Compile Include="Data\ItemsGroup.cs" />
+    <Compile Include="Data\PeopleByFirstName.cs" />
+    <Compile Include="Data\PeopleInGroup.cs" />
+    <Compile Include="Data\Person.cs" />
+    <Compile Include="History.xaml.cs">
+      <DependentUpon>History.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
@@ -134,6 +144,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Page Include="History.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Settings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -228,6 +242,7 @@
       <LastGenOutput>AppResources.uk-UA.resx</LastGenOutput>
     </XliffResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

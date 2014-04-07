@@ -23,6 +23,7 @@ using MSPToolkit.Encodings;
 using Microsoft.Phone.Tasks;
 using System.Collections.ObjectModel;
 using FastLoader.Classes;
+using FastLoader.Data;
 
 namespace FastLoader
 {
@@ -406,12 +407,7 @@ namespace FastLoader
 		{
 			(sender as ApplicationBar).Opacity = e.IsMenuVisible ? 0.95 : 0;
 		}
-
-		private void ClearCacheMenuPressed(object sender, EventArgs e)
-		{
-			
-		}
-
+		
 		// Sample code for building a localized ApplicationBar
 		private void BuildLocalizedApplicationBar()
 		{
@@ -441,9 +437,18 @@ namespace FastLoader
 			appBarMenuItem.Click += NoticeAboutBadPage;
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
 
+			appBarMenuItem = new ApplicationBarMenuItem(AppResources.History);
+			appBarMenuItem.Click += OpenHistoryMenuItem_Click;
+			ApplicationBar.MenuItems.Add(appBarMenuItem);
+			 
 			appBarMenuItem = new ApplicationBarMenuItem(AppResources.Settings);
 			appBarMenuItem.Click += (object sender, EventArgs e) => { NavigationService.Navigate(new Uri("/Settings.xaml", UriKind.Relative)); };
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
+		}
+
+		void OpenHistoryMenuItem_Click(object sender, EventArgs e)
+		{
+			NavigationService.Navigate(new Uri("/History.xaml", UriKind.Relative)); 
 		}
 
 		void NoticeAboutBadPage(object sender, EventArgs e)

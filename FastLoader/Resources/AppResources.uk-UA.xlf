@@ -9,33 +9,39 @@
         <trans-unit id="Resx/ResourceFlowDirection" translate="yes" xml:space="preserve">
           <source>LeftToRight</source>
           <target state="translated">LeftToRight</target>
+          <note from="MultilingualBuild" annotates="source" priority="2">Controls the FlowDirection for all elements in the RootFrame. Set to the traditional direction of this resource file's language</note>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">Controls the FlowDirection for all elements in the RootFrame. Set to the traditional direction of this resource file's language</note></trans-unit>
+        </trans-unit>
         <trans-unit id="Resx/ResourceLanguage" translate="yes" xml:space="preserve">
           <source>en-US</source>
           <target state="translated">uk-UA</target>
+          <note from="MultilingualBuild" annotates="source" priority="2">Controls the Language and ensures that the font for all elements in the RootFrame aligns with the app's language. Set to the language code of this resource file's language.</note>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">Controls the Language and ensures that the font for all elements in the RootFrame aligns with the app's language. Set to the language code of this resource file's language.</note></trans-unit>
+        </trans-unit>
         <trans-unit id="Resx/ExceptionMessage" translate="yes" xml:space="preserve">
           <source>Sorry, but open the page on this link fails</source>
           <target state="translated">Вибачте, але відкриті сторінку за цим посилання не вдається</target>
+          <note from="MultilingualBuild" annotates="source" priority="2">2</note>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">2</note></trans-unit>
+        </trans-unit>
         <trans-unit id="Resx/ClearCacheMessage" translate="yes" xml:space="preserve">
           <source>Clear cache and delete all previously downloaded pages?</source>
           <target state="needs-review-translation" state-qualifier="mt-suggestion">Очистити кеш-пам'ять і видалити всі попередньо завантаженого сторінки?</target>
+          <note from="MultilingualBuild" annotates="source" priority="2">1</note>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">1</note></trans-unit>
+        </trans-unit>
         <trans-unit id="Resx/ClearCacheMenuItem" translate="yes" xml:space="preserve">
           <source>clear cache</source>
           <target state="translated">очистити кеш</target>
+          <note from="MultilingualBuild" annotates="source" priority="2">3</note>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">3</note></trans-unit>
+        </trans-unit>
         <trans-unit translate="yes" id="Resx/AboutText" xml:space="preserve">
           <source>Fast loading pages from internet and offline viewing.</source>
           <target state="translated">Швидке завантаженны сторінок з інтернету з подальшим переглядом оффлайн.</target>
+          <note from="MultilingualBuild" annotates="source" priority="2">7</note>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">7</note></trans-unit>
+        </trans-unit>
         <trans-unit translate="yes" id="Resx/Refresh" xml:space="preserve">
           <source>Refresh</source>
           <target state="translated">Оновити</target>
@@ -43,8 +49,9 @@
         <trans-unit translate="yes" id="Resx/About" xml:space="preserve">
           <source>about</source>
           <target state="translated">про программу</target>
+          <note from="MultilingualBuild" annotates="source" priority="2">9</note>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">9</note></trans-unit>
+        </trans-unit>
         <trans-unit translate="yes" id="Resx/OpenInIE" xml:space="preserve">
           <source>Open in Internet Explorer</source>
           <target state="translated">відкрити у Internet Explorer</target>
@@ -65,11 +72,16 @@
           <source>report about bad page</source>
           <target state="translated">невірна сторінка</target>
         </trans-unit>
+        <trans-unit id="Resx/History" translate="yes" xml:space="preserve">
+          <source>History</source>
+          <target state="translated" state-qualifier="tm-suggestion">Журнал</target>
+        </trans-unit>
         <trans-unit translate="yes" id="Resx/RateApp" xml:space="preserve">
           <source>rate application</source>
           <target state="translated">оцінити програму</target>
+          <note from="MultilingualBuild" annotates="source" priority="2">5</note>
           
-        <note from="MultilingualBuild" annotates="source" priority="2">5</note></trans-unit>
+        </trans-unit>
       </group>
     </body>
   </file>

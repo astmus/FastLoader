@@ -142,7 +142,7 @@
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar  Mode="Minimized" ForegroundColor="{StaticResource PhoneAccentColor}"  StateChanged="ApplicationBar_StateChanged"  Opacity="0"  IsVisible="True" IsMenuEnabled="False">
             <shell:ApplicationBar.MenuItems>
-                <shell:ApplicationBarMenuItem Text="Clear cache" Click="ClearCacheMenuPressed"/>                
+                
             </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
