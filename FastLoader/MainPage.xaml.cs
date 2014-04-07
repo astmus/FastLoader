@@ -38,6 +38,7 @@ namespace FastLoader
 		Uri _currentPage;
 		Stack<Uri> _hystory = new Stack<Uri>();
 		ObservableCollection<string> _completions = new ObservableCollection<string>();
+		bool _nowIsPageRefreshing = false;
 		//Stack<DomainPagesCount> _domains = new Stack<DomainPagesCount>();
 		//Dictionary<Uri, String> _uriFileNames = new Dictionary<Uri, string>();
 		public MainPage()
@@ -357,7 +358,11 @@ namespace FastLoader
 			}
 			else
 			{
-				if (_request == null) return;
+				if (_request == null || _nowIsPageRefreshing)
+				{
+					_nowIsPageRefreshing = false;
+					return;
+				}				
 
 				if (!_hystory.Contains(_currentPage))
 				{
@@ -458,6 +463,7 @@ namespace FastLoader
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(filename))
 			{
 				IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(filename);
+				_nowIsPageRefreshing = true;
 				Navigate(_currentPage);
 			}
 		}
