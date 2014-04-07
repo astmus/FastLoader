@@ -11,19 +11,27 @@ using Microsoft.Phone.Tasks;
 
 namespace FastLoader
 {
-	public partial class AboutPage : PhoneApplicationPage
+	public partial class SettingsPage : PhoneApplicationPage
 	{
-		public AboutPage()
+		public static event Action ClearCachePressed;
+
+		public SettingsPage()
 		{
 			this.DataContext = AppSettings.Instance;
 			InitializeComponent();
-			appName.Text += " (v 1.0.2.13)";
+			appName.Text += " (v 1.0.3.14)";
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			MarketplaceReviewTask marketplaceReviewTask = new MarketplaceReviewTask();
 			marketplaceReviewTask.Show();
+		}
+
+		private void Button_Click_1(object sender, RoutedEventArgs e)
+		{
+			if (ClearCachePressed != null)
+				ClearCachePressed();
 		}
 	}
 }

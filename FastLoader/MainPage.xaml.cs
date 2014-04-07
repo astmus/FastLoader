@@ -50,7 +50,23 @@ namespace FastLoader
 			PhoneApplicationService.Current.Deactivated += Current_Deactivated;
 			AppSettings.Instance.SaveAutoCompletionsListValueCahnged += Instance_SaveAutoCompletionsListValueCahnged;
 			_currentPage = new Uri(START_PAGE, UriKind.Relative);
+			SettingsPage.ClearCachePressed += SettingsPage_ClearCachePressed;
 			browser.Navigate(_currentPage);
+		}
+
+		void SettingsPage_ClearCachePressed()
+		{
+			long size = IsolatedStorageFile.GetUserStoreForApplication().GetCurretnSize();
+			if (MessageBox.Show(AppResources.ClearCacheMessage + " ( " + Utils.ConvertCountBytesToString(size) + " )", "", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+			{
+				using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
+				{
+					isf.Remove();
+					_hystory.Clear();
+					_currentPage = new Uri(START_PAGE, UriKind.Relative);
+					browser.Navigate(_currentPage);
+				}
+			}
 		}
 
 		void Current_Deactivated(object sender, DeactivatedEventArgs e)
@@ -347,10 +363,9 @@ namespace FastLoader
 					SetCurrentDomainFromUrl(uriForNavigate);
 				}
 				else
-				{					
-					string s = _currentDomain + "/" + e.Uri.OriginalString;
-					if (s.Contains("//"))
-						s = s.Replace("//", "/");
+				{
+					string ump = e.Uri.OriginalString[0] != '/' ? "/" : "" ;
+					string s = _currentDomain + ump + e.Uri.OriginalString;
 					uriForNavigate = new Uri(HttpUtility.UrlDecode(s), UriKind.Absolute);
 				}
 
@@ -394,17 +409,7 @@ namespace FastLoader
 
 		private void ClearCacheMenuPressed(object sender, EventArgs e)
 		{
-			long size = IsolatedStorageFile.GetUserStoreForApplication().GetCurretnSize();
-			if (MessageBox.Show(AppResources.ClearCacheMessage + " ( " + Utils.ConvertCountBytesToString(size) + " )", "", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-			{
-				using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
-				{
-					isf.Remove();
-					_hystory.Clear();
-					_currentPage = new Uri(START_PAGE, UriKind.Relative);
-					browser.Navigate(_currentPage);
-				}
-			}
+			
 		}
 
 		// Sample code for building a localized ApplicationBar
@@ -418,11 +423,7 @@ namespace FastLoader
 			ApplicationBar.ForegroundColor = (Color)Application.Current.Resources["PhoneAccentColor"];
 			ApplicationBar.StateChanged += ApplicationBar_StateChanged;
 			// Create a new menu item with the localized string from AppResources.
-			ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.ClearCacheMenuItem);
-			appBarMenuItem.Click += ClearCacheMenuPressed;
-			ApplicationBar.MenuItems.Add(appBarMenuItem);
-
-			appBarMenuItem = new ApplicationBarMenuItem(AppResources.Refresh);
+			ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.Refresh);
 			appBarMenuItem.Click += RefreshCurrentPage;
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
 

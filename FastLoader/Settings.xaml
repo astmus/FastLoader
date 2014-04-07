@@ -1,5 +1,5 @@
 ﻿<phone:PhoneApplicationPage
-    x:Class="FastLoader.AboutPage"
+    x:Class="FastLoader.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
@@ -30,12 +30,14 @@
                     <CheckBox IsChecked="{Binding SaveAutocompletionsList, Mode=TwoWay}"  Content="{Binding Path=LocalizedResources.SettingsSaveCompletions, Source={StaticResource LocalizedStrings}}">
                         
                     </CheckBox>
+                    <Button Content="{Binding Path=LocalizedResources.ClearCacheMenuItem, Source={StaticResource LocalizedStrings}}" Click="Button_Click_1" />
                     <TextBlock Margin="12,13,0,0" Text="{Binding Path=LocalizedResources.About, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>
                         
                     <StackPanel Margin="20,0,0,28">                       
                     <TextBlock x:Name="appName"  Text="Fast Loader"/>
                         <TextBlock x:Name="aboutText" TextWrapping="Wrap"  Text="{Binding Path=LocalizedResources.AboutText, Source={StaticResource LocalizedStrings}}"/>
                     </StackPanel>
+                    
                 <Button Content="{Binding Path=LocalizedResources.RateApp, Source={StaticResource LocalizedStrings}}" Click="Button_Click" />
                 </StackPanel>
             </ScrollViewer>
