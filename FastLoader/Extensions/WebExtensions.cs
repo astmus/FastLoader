@@ -36,29 +36,7 @@ namespace FastLoader.Extensions
 			return new WebItem(b.Uri);
 		}
 
-		public static string GetLocalHystoryFileName(this Uri uri)
-		{
-			StringBuilder b = new StringBuilder(uri.OriginalString);
-
-			foreach (char c in _invalidChars)
-				b.Replace(c, ' ');
-			
-			b.Insert(0, "storagefile");
-			b.Replace(" ", "");
-			b.Replace(".", "");
-			if (b.Length > 150)
-				b.Remove(150, b.Length - 150);
-			b.Append(".html");
-			return b.ToString();            
-		}
-
-		public static Uri AsLocalHystoryUri(this Uri uri)
-		{
-			if (!uri.IsAbsoluteUri) return uri;
-			string res = WebExtensions.GetLocalHystoryFileName(uri);
-			Debug.WriteLine(res);
-			return new Uri(res, UriKind.Relative);
-		}
+		
 
 	}
 }

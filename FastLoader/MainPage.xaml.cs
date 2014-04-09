@@ -208,7 +208,7 @@ namespace FastLoader
 				temporaryStream = sourceStream;
 			
 
-			string fileName = _request.HttpRequest.RequestUri.GetLocalHystoryFileName();
+			//string fileName = _request.HttpRequest.RequestUri.GetLocalHystoryFileName();
 			_request.IsPerformed = false;
 			StreamReader reader = new StreamReader(temporaryStream);
 			string content = reader.ReadToEnd();
@@ -270,6 +270,7 @@ namespace FastLoader
 
 			RemoveImgTagsFromPage(ref content);
 
+			string fileName = (_request.HttpRequest.RequestUri as WebItem).LocalHystoryFileName;
 			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(fileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
 			{
 				StreamWriter sw = new StreamWriter(savefilestr);

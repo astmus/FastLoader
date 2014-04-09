@@ -1,14 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace FastLoader.Classes
 {
 	public class WebItem : Uri
 	{
 		const string START_PAGE = "storagefilestart.html";
+		static char[] _invalidChars;
+
+		static WebItem()
+		{
+			_invalidChars = Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).Concat(new []{'#'}).ToArray();
+		}
 
 		public WebItem(string uriString, UriKind uriKind)
 			: base(uriString, uriKind)
@@ -22,6 +30,41 @@ namespace FastLoader.Classes
 
 		}
 
+		string _localHystoryFileName;
+		public string LocalHystoryFileName
+		{
+			get{
+				if (_localHystoryFileName == null)
+				{
+					StringBuilder b = new StringBuilder(this.OriginalString);
+
+					foreach (char c in _invalidChars)
+						b.Replace(c, ' ');
+
+					b.Insert(0, "storagefile");
+					b.Replace(" ", "");
+					b.Replace(".", "");
+					if (b.Length > 150)
+						b.Remove(150, b.Length - 150);
+					b.Append(".html");
+					_localHystoryFileName = b.ToString();
+				}
+				return _localHystoryFileName;
+			}
+			
+		}
+
+		public WebItem AsLocalHystoryUri
+		{
+			get
+			{
+				if (!this.IsAbsoluteUri) return uri;
+				string res = LocalHystoryFileName;
+				return new Uri(res, UriKind.Relative);
+			}
+		}
+
+#region Static
 
 		static WebItem _startPage;
 		public static WebItem StartPage
@@ -40,5 +83,6 @@ namespace FastLoader.Classes
 				return _googlePage ?? (_googlePage = new WebItem("https://www.google.com", UriKind.Absolute));
 			}
 		}
+#endregion
 	}
 }
