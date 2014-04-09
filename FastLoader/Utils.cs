@@ -30,7 +30,7 @@ namespace FastLoader
 			return (res / 1024).ToString(format) + " GByte";
 		}
 
-		public static Stream CopyAndClose(Stream inputStream, int expectedLength)
+		public static MemoryStream CopyAndClose(Stream inputStream, int expectedLength)
 		{
 			const int readSize = 256;
 			byte[] buffer = new byte[readSize];

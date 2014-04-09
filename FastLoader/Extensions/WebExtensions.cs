@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using FastLoader.Classes;
 
 namespace FastLoader.Extensions
 {
@@ -16,7 +17,7 @@ namespace FastLoader.Extensions
 			_invalidChars = Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).Concat(new []{'#'}).ToArray();
 		}
 
-		public static Uri RemoveQueryParams(this Uri uri, params string[] keys)
+		public static WebItem RemoveQueryParams(this Uri uri, params string[] keys)
 		{
 			UriBuilder b = new UriBuilder(uri);
 			int position;
@@ -32,7 +33,7 @@ namespace FastLoader.Extensions
 
 				b.Query = string.Join("&", queryParams.Select(x => x.Key + "=" + x.Value).ToArray());
 			}
-			return b.Uri;
+			return new WebItem(b.Uri);
 		}
 
 		public static string GetLocalHystoryFileName(this Uri uri)

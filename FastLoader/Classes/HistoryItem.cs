@@ -4,25 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FastLoader.Data
+namespace FastLoader.Classes
 {
-	public class HistoryItem
+	public class HistoryItem : WebItem
 	{
 		public Uri Link { get; set; }
 		public DateTime TimeOpening { get; set; }
 		public Uri Favicon { get; set; }
 		public String Title { get; set; }
 
-		public HistoryItem()
+		public HistoryItem(WebItem item) : base (item.OriginalString, item.IsAbsoluteUri? UriKind.Absolute : UriKind.Relative)
 		{
 
 		}
 
-		public HistoryItem(Uri uri)
+		public HistoryItem() : base("",UriKind.Relative)
 		{
-			Link = uri;
-			TimeOpening = DateTime.Now;
-			Favicon = new Uri (uri.Authority + "/favicon.ico");
+
 		}
 
 		public override string ToString()

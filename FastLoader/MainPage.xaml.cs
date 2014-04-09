@@ -30,14 +30,14 @@ namespace FastLoader
 	public partial class MainPage : PhoneApplicationPage
 	{
 		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/search?q=";
-		const string START_PAGE = "storagefilestart.html";
+		
 		const string DEFAULT_CONTENT_TYPE = "text/html; charset=UTF-8";
 		// Constructor
 		HttpWebRequestIndicate _request;
 		string _currentDomain;
 		//string _currentFileName;
-		Uri _currentPage;
-		Stack<Uri> _hystory = new Stack<Uri>();
+		WebItem _currentPage;
+		Stack<HistoryItem> _hystory = new Stack<HistoryItem>();
 		ObservableCollection<string> _completions = new ObservableCollection<string>();
 		bool _nowIsPageRefreshing = false;
 		//Stack<DomainPagesCount> _domains = new Stack<DomainPagesCount>();
@@ -50,7 +50,7 @@ namespace FastLoader
 			PhoneApplicationService.Current.Activated += Current_Activated;
 			PhoneApplicationService.Current.Deactivated += Current_Deactivated;
 			AppSettings.Instance.SaveAutoCompletionsListValueCahnged += Instance_SaveAutoCompletionsListValueCahnged;
-			_currentPage = new Uri(START_PAGE, UriKind.Relative);
+			_currentPage = WebItem.StartPage;
 			SettingsPage.ClearCachePressed += SettingsPage_ClearCachePressed;
 			browser.Navigate(_currentPage);
 		}
@@ -64,7 +64,7 @@ namespace FastLoader
 				{
 					isf.Remove();
 					_hystory.Clear();
-					_currentPage = new Uri(START_PAGE, UriKind.Relative);
+					_currentPage = WebItem.StartPage;
 					browser.Navigate(_currentPage);
 				}
 			}
@@ -138,7 +138,7 @@ namespace FastLoader
 				e.Cancel = true;
 				// Pop pages from history occur in browser_Navigating method because 
 				// there we check navigating to new page or back to previous
-				Uri previousPage = _hystory.Peek();
+				WebItem previousPage = _hystory.Peek();
 				_currentPage = previousPage;
 				browser.Navigate(previousPage.AsLocalHystoryUri());
 			}
@@ -160,11 +160,11 @@ namespace FastLoader
 				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && (sender as AutoCompleteBox).Text.Contains('.'))
 				{
 					SetCurrentDomainFromUrl(outputUri);
-					Navigate(outputUri);
+					Navigate(new WebItem(outputUri));
 				}
 				else
 				{
-					SetCurrentDomainFromUrl(new Uri("https://www.google.com", UriKind.Absolute));
+					SetCurrentDomainFromUrl(WebItem.GooglePage);
 					Search((sender as AutoCompleteBox).Text);
 				}
 			}
@@ -186,7 +186,7 @@ namespace FastLoader
 				Dispatcher.BeginInvoke(() =>
 				{
 					progressBar.IsIndeterminate = false;
-					if (_currentPage.OriginalString != START_PAGE)
+					if (_currentPage != WebItem.StartPage)
 						SetCurrentDomainFromUrl(_currentPage);
 #if DEBUG
 					MessageBox.Show(AppResources.ExceptionMessage + Environment.NewLine + _request.HttpRequest.RequestUri.OriginalString + Environment.NewLine + e.Message);
@@ -197,15 +197,21 @@ namespace FastLoader
 				return;
 			}
 
-			Stream sourceStream = Utils.CopyAndClose(response.GetResponseStream(), (int)response.ContentLength);
+			Stream temporaryStream;
+			MemoryStream sourceStream = Utils.CopyAndClose(response.GetResponseStream(), (int)response.ContentLength);			
 
-			if (response.Headers[HttpRequestHeader.ContentEncoding] == "gzip")
-				sourceStream = new GZipStream(sourceStream, CompressionMode.Decompress);
+			bool isZipped = response.Headers[HttpRequestHeader.ContentEncoding] == "gzip";
+			
+			if (isZipped)
+				temporaryStream = new GZipStream(sourceStream, CompressionMode.Decompress);
+			else
+				temporaryStream = sourceStream;
+			
 
 			string fileName = _request.HttpRequest.RequestUri.GetLocalHystoryFileName();
 			_request.IsPerformed = false;
-			StreamReader sourceReader = new StreamReader(sourceStream);
-			string content = sourceReader.ReadToEnd();
+			StreamReader reader = new StreamReader(temporaryStream);
+			string content = reader.ReadToEnd();
 			string charset = null;
 			bool charsetContainsInPage = true;
 			try
@@ -230,7 +236,7 @@ namespace FastLoader
 				try
 				{
 					sourceStream.Position = 0;
-					StreamReader r = new StreamReader(sourceStream, encoding);
+					StreamReader r = new StreamReader(isZipped ? (new GZipStream(sourceStream, CompressionMode.Decompress)) as Stream : sourceStream, encoding);
 					content = r.ReadToEnd();
 					if (charsetContainsInPage)
 						content = content.Replace(charset, "utf-8");
@@ -240,7 +246,7 @@ namespace FastLoader
 					Dispatcher.BeginInvoke(() =>
 					{
 						progressBar.IsIndeterminate = false;
-						if (_currentPage.OriginalString != START_PAGE)
+						if (_currentPage != WebItem.StartPage)
 							SetCurrentDomainFromUrl(_currentPage);
 #if DEBUG
 						MessageBox.Show(AppResources.ExceptionMessage + Environment.NewLine + _request.HttpRequest.RequestUri.OriginalString + Environment.NewLine + ex.Message);
@@ -281,13 +287,14 @@ namespace FastLoader
 
 		string GetCharsetFromContent(string content)
 		{
-			return Regex.Match(content, "<meta.+?charset=([^\";']+)").Groups[1].Value;
+			//return Regex.Match(content, "<meta.+?charset=([^\";']+)").Groups[1].Value;
+			return Regex.Match(content, "<meta.+?charset=\"?(.+?)[\";]").Groups[1].Value;
 		}
 
 		string GetCharsetFromHeaders(HttpWebResponse response)
 		{
 			string contentType = response.Headers[HttpRequestHeader.ContentType];
-			return Regex.Match(contentType, "charset=([^\";']+)").Groups[1].Value;
+			return contentType;
 		}
 
 		void RemoveImgTagsFromPage(ref string pageContent)
@@ -309,10 +316,8 @@ namespace FastLoader
 
 			// if it file exists in the storage then load it
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(link.GetLocalHystoryFileName()))
-			{
 				//_currentPage = uriForNavigate;
 				browser.Navigate(link.AsLocalHystoryUri());
-			}
 			else
 				_request.BeginGetResponse(new AsyncCallback(HandleResponse), null);
 		}
@@ -323,7 +328,7 @@ namespace FastLoader
 		/// <param name="search"></param>
 		void Search(string search)
 		{
-			Uri uriForSearch = new Uri(GOOGLE_SEARCH_DOMAIN + search, UriKind.Absolute);
+			WebItem uriForSearch = new WebItem(GOOGLE_SEARCH_DOMAIN + search, UriKind.Absolute);
 			Navigate(uriForSearch);
 		}
 
@@ -331,11 +336,14 @@ namespace FastLoader
 		private void browser_Navigated(object sender, NavigationEventArgs e)
 		{
 			if (isFirstTime)
+			{
 				Scheduler.Dispatcher.Schedule(() =>
 				{
 					LayoutRoot.Children.Remove(placeholder);
 					ApplicationBar.IsVisible = true;
 				}, TimeSpan.FromMilliseconds(500));
+				isFirstTime = false;
+			}
 			progressBar.IsIndeterminate = false;
 		}
 
@@ -355,7 +363,7 @@ namespace FastLoader
 				if (e.Uri.OriginalString.Contains("http"))
 				{
 					string clearUri = e.Uri.OriginalString.Remove(0, e.Uri.OriginalString.IndexOf("http"));
-					uriForNavigate = new Uri(HttpUtility.UrlDecode(clearUri), UriKind.Absolute);
+					uriForNavigate = new WebItem(HttpUtility.UrlDecode(clearUri), UriKind.Absolute);
 					if (uriForNavigate.OriginalString.Contains("ei") &&
 						uriForNavigate.OriginalString.Contains("sa") &&
 						uriForNavigate.OriginalString.Contains("ved") &&
@@ -367,7 +375,7 @@ namespace FastLoader
 				{
 					string ump = e.Uri.OriginalString[0] != '/' ? "/" : "" ;
 					string s = _currentDomain + ump + e.Uri.OriginalString;
-					uriForNavigate = new Uri(HttpUtility.UrlDecode(s), UriKind.Absolute);
+					uriForNavigate = new WebItem(HttpUtility.UrlDecode(s), UriKind.Absolute);
 				}
 
 				Navigate(uriForNavigate);
@@ -383,14 +391,14 @@ namespace FastLoader
 				if (!_hystory.Contains(_currentPage))
 				{
 					// if we navigating to new loaded page
-					_hystory.Push(_currentPage);
-					_currentPage = _request.HttpRequest.RequestUri;
+					_hystory.Push(new HistoryItem(_currentPage));
+					_currentPage = _request.HttpRequest.RequestUri as WebItem;
 				}
 				else
 				{
 					// if we step back by history
 					_currentPage = _hystory.Pop();
-					if (_currentPage.OriginalString != START_PAGE)
+					if (_currentPage != WebItem.StartPage)
 						SetCurrentDomainFromUrl(_currentPage);
 					else
 						_currentDomain = "";
@@ -426,7 +434,7 @@ namespace FastLoader
 			appBarMenuItem = new ApplicationBarMenuItem(AppResources.OpenInIE);
 			appBarMenuItem.Click += (object sender, EventArgs e) =>
 			{
-				if (_currentPage.OriginalString == START_PAGE) return;
+				if (_currentPage == WebItem.StartPage) return;
 				WebBrowserTask task = new WebBrowserTask();
 				task.Uri = _currentPage;
 				task.Show();
@@ -453,7 +461,7 @@ namespace FastLoader
 
 		void NoticeAboutBadPage(object sender, EventArgs e)
 		{
-			if (_currentPage.OriginalString == START_PAGE)
+			if (_currentPage == WebItem.StartPage)
 				return;
 
 			EmailComposeTask email = new EmailComposeTask();
