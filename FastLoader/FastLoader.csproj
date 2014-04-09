@@ -94,13 +94,9 @@
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
     <Compile Include="Classes\HttpWebRequestIndicate.cs" />
-    <Compile Include="Data\AllPeople.cs" />
     <Compile Include="Data\HistoryItem.cs" />
     <Compile Include="Data\HistoryItemsByDate.cs" />
     <Compile Include="Data\ItemsGroup.cs" />
-    <Compile Include="Data\PeopleByFirstName.cs" />
-    <Compile Include="Data\PeopleInGroup.cs" />
-    <Compile Include="Data\Person.cs" />
     <Compile Include="History.xaml.cs">
       <DependentUpon>History.xaml</DependentUpon>
     </Compile>

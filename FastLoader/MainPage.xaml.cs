@@ -125,7 +125,7 @@ namespace FastLoader
 		protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
 		{
 			base.OnBackKeyPress(e);
-			if (_request.IsPerformed)
+			if (_request != null && _request.IsPerformed)
 			{				
 				_request.Abort();				
 				progressBar.IsIndeterminate = false;
