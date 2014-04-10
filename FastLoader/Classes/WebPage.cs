@@ -40,7 +40,7 @@ namespace FastLoader.Classes
 
 					foreach (char c in _invalidChars)
 						b.Replace(c, ' ');
-
+                    
 					b.Insert(0, "storagefile");
 					b.Replace(" ", "");
 					b.Replace(".", "");
@@ -54,13 +54,18 @@ namespace FastLoader.Classes
 			
 		}
 
-		public WebItem AsLocalHystoryUri
+        WebItem _localHistoryItem;
+		public WebItem LocalHystoryUri
 		{
 			get
 			{
-				if (!this.IsAbsoluteUri) return uri;
-				string res = LocalHystoryFileName;
-				return new Uri(res, UriKind.Relative);
+				if (!this.IsAbsoluteUri) return this;
+                if (_localHistoryItem == null)
+                {
+                    string res = LocalHystoryFileName;
+                    return new WebItem(res, UriKind.Relative);
+                }
+                return _localHistoryItem;
 			}
 		}
 

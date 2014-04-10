@@ -12,6 +12,7 @@ namespace FastLoader.Classes
 		public HttpWebRequestIndicate(HttpWebRequest request)
 		{
 			HttpRequest = request;
+            IsAborted = false;
 		}
 
 		public HttpWebRequest HttpRequest
@@ -26,10 +27,17 @@ namespace FastLoader.Classes
 			set;
 		}
 
+        public bool IsAborted
+        {
+            get;
+            set;
+        }
+
 		public void Abort()
 		{
 			HttpRequest.Abort();
-			IsPerformed = false;
+            IsPerformed = false;
+            IsAborted = true;
 		}
 
 		public IAsyncResult BeginGetResponse(AsyncCallback callback, object state)

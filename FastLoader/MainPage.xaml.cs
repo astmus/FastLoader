@@ -78,8 +78,8 @@ namespace FastLoader
 
 		void Current_Activated(object sender, ActivatedEventArgs e)
 		{
-			if (_request != null && _request.IsPerformed)
-				Navigate(_request.HttpRequest.RequestUri);
+			if (_request != null && _request.IsAborted)
+				Navigate(_request.HttpRequest.RequestUri as WebItem);
 		}
 
 		void Instance_SaveAutoCompletionsListValueCahnged(bool obj)
@@ -140,7 +140,7 @@ namespace FastLoader
 				// there we check navigating to new page or back to previous
 				WebItem previousPage = _hystory.Peek();
 				_currentPage = previousPage;
-				browser.Navigate(previousPage.AsLocalHystoryUri());
+				browser.Navigate(previousPage.LocalHystoryUri);
 			}
 		}
 
@@ -260,9 +260,9 @@ namespace FastLoader
 
 			if (charsetContainsInPage == false)
 			{
-				int pos = content.IndexOf("<head>");
+                int pos = content.IndexOf("</head>");
 				if (pos != -1)
-					content = content.Insert(pos + 6, string.Format("<meta content=\"{0}\" http-equiv=\"Content-Type\">", DEFAULT_CONTENT_TYPE));
+					content = content.Insert(pos , string.Format("<meta content=\"{0}\" http-equiv=\"Content-Type\">", DEFAULT_CONTENT_TYPE));
 			}
 
 			if (_currentDomain.Contains("google"))
@@ -307,7 +307,7 @@ namespace FastLoader
 		/// Load page from url to isolated storage and navigate to it
 		/// </summary>
 		/// <param name="link"></param>
-		void Navigate(Uri link)
+		void Navigate(WebItem link)
 		{
 			this.Focus();
 			progressBar.IsIndeterminate = true;
@@ -316,9 +316,9 @@ namespace FastLoader
 			_request.HttpRequest.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 
 			// if it file exists in the storage then load it
-			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(link.GetLocalHystoryFileName()))
+			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(link.LocalHystoryFileName))
 				//_currentPage = uriForNavigate;
-				browser.Navigate(link.AsLocalHystoryUri());
+				browser.Navigate(link.LocalHystoryUri);
 			else
 				_request.BeginGetResponse(new AsyncCallback(HandleResponse), null);
 		}
@@ -358,7 +358,7 @@ namespace FastLoader
 			if (e.Uri.OriginalString.StartsWith("storagefile") == false)
 			{
 				e.Cancel = true;
-				Uri uriForNavigate = null;
+				WebItem uriForNavigate = null;
 				//Debug.WriteLine(browser.Source);
 
 				if (e.Uri.OriginalString.Contains("http"))
@@ -474,7 +474,7 @@ namespace FastLoader
 
 		void RefreshCurrentPage(object sender, EventArgs e)
 		{
-			string filename = _currentPage.GetLocalHystoryFileName();
+			string filename = _currentPage.LocalHystoryFileName;
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(filename))
 			{
 				IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(filename);
