@@ -52,21 +52,21 @@
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="BuddiesItemTemplate">
-            <Grid Margin="12,8,0,8">
+            <Grid toolkit:TiltEffect.IsTiltEnabled="True" Tap="Grid_Tap"  Margin="12,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Image Width="32" Height="32" Source="{Binding Favicon}" VerticalAlignment="Top"/>
+                <Image CacheMode="BitmapCache"  Width="64" Height="64" Source="{Binding Favicon}" VerticalAlignment="Top" />
                 <StackPanel Grid.Column="1" VerticalAlignment="Top">                    
                     <TextBlock Text="{Binding Title}" Style="{StaticResource PhoneTextNormalStyle}" TextWrapping="Wrap" FontFamily="{StaticResource PhoneFontFamilySemiBold}"/>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Time:" Style="{StaticResource PhoneTextSmallStyle}"/>
-                        <TextBlock Text="{Binding TimeOpening}" Style="{StaticResource PhoneTextSmallStyle}" FontFamily="{StaticResource PhoneFontFamilySemiBold}"/>
+                        <TextBlock Text="{Binding Path=LocalizedResources.Time, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextSmallStyle}"/>
+                        <TextBlock Text="{Binding OpenTime, StringFormat='{}{0:HH:mm}'}" Style="{StaticResource PhoneTextSmallStyle}" FontFamily="{StaticResource PhoneFontFamilySemiBold}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Size:" Style="{StaticResource PhoneTextSmallStyle}"/>
-                        <TextBlock Text="{Binding Favicon}" Style="{StaticResource PhoneTextSmallStyle}" FontFamily="{StaticResource PhoneFontFamilySemiBold}"/>
+                        <TextBlock Text="{Binding Path=LocalizedResources.Size, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextSmallStyle}"/>
+                        <TextBlock Text="{Binding FormatedSize}" Style="{StaticResource PhoneTextSmallStyle}" FontFamily="{StaticResource PhoneFontFamilySemiBold}"/>
                     </StackPanel>
                 </StackPanel>
             </Grid>
@@ -75,11 +75,14 @@
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <TextBlock Margin="12,10,0,10" Grid.Row="0" Text="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>
-        <toolkit:LongListMultiSelector Grid.Row="1"  x:Name="buddies" Background="Transparent"
+        <!--<TextBlock Margin="12,10,0,10" Grid.Row="0" Text="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>-->
+        <phone:Pivot Title="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}"
+                     x:Name="MainPivot"
+                    >
+            <phone:PivotItem Header="{Binding Path=LocalizedResources.CacheTitle, Source={StaticResource LocalizedStrings}}"  x:Name="CacheItem">
+        <toolkit:LongListMultiSelector x:Name="history" Background="Transparent"
                                                 Margin="0,-8,0,0"
                                                 ItemsSource="{StaticResource dates}"
                                                 LayoutMode="List"
@@ -87,11 +90,14 @@
                                                 HideEmptyGroups="True"
                                                 JumpListStyle="{StaticResource BuddiesJumpListStyle}"
                                                 GroupHeaderTemplate="{StaticResource BuddiesGroupHeaderTemplate}"
-                                                ItemTemplate="{StaticResource BuddiesItemTemplate}"
+                                                ItemTemplate="{StaticResource BuddiesItemTemplate}"                                       
             />
-        <!--<phone:Pivot Title="LONGLISTMULTISELECTOR SAMPLE"
-                     x:Name="SamplePivot"
-                    >-->
+                </phone:PivotItem>
+            <phone:PivotItem Header="{Binding Path=LocalizedResources.HistoryTitle, Source={StaticResource LocalizedStrings}}"  x:Name="HistoryItem">
+                <TextBlock Margin="12" Style="{StaticResource PhoneTextLargeStyle}"  Text="{Binding Path=LocalizedResources.WillBeSoon, Source={StaticResource LocalizedStrings}}"/>
+            </phone:PivotItem>
+            </phone:Pivot>
+        <!---->
 
         <!--TitlePanel contains the name of the application and page title-->
         <!--<StackPanel Grid.Row="0" Margin="12,17,0,28">

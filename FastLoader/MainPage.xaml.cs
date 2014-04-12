@@ -24,6 +24,7 @@ using Microsoft.Phone.Tasks;
 using System.Collections.ObjectModel;
 using FastLoader.Classes;
 using FastLoader.Data;
+using FastLoader.DB;
 
 namespace FastLoader
 {
@@ -40,6 +41,7 @@ namespace FastLoader
 		Stack<WebItem> _history = new Stack<WebItem>();
 		ObservableCollection<string> _completions = new ObservableCollection<string>();
 		bool _nowIsPageRefreshing = false;
+		bool _isOpenHistory = false;
 		//Stack<DomainPagesCount> _domains = new Stack<DomainPagesCount>();
 		//Dictionary<Uri, String> _uriFileNames = new Dictionary<Uri, string>();
 		public MainPage()
@@ -57,6 +59,8 @@ namespace FastLoader
 
 		void SettingsPage_ClearCachePressed()
 		{
+			FSDBManager.Instance.Dispose();
+			FSDBManager.Instance = null;
 			long size = IsolatedStorageFile.GetUserStoreForApplication().GetCurretnSize();
 			if (MessageBox.Show(AppResources.ClearCacheMessage + " ( " + Utils.ConvertCountBytesToString(size) + " )", "", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
 			{
@@ -279,6 +283,19 @@ namespace FastLoader
 				savefilestr.Close();
 			}
 
+			//add item to persist history
+			HistoryItem historyItem = new HistoryItem()
+			{
+				Link = item.OriginalString,
+				Size = item.Size,
+				OpenTime = DateTime.Now,
+				Title = Utils.GetTitleFromHtmlPage(content),
+				FormatedSize = Utils.ConvertCountBytesToString(item.Size)
+			};
+
+			FSDBManager.Instance.History.InsertOnSubmit(historyItem);
+			FSDBManager.Instance.SubmitChanges();
+
 			sourceStream.Dispose();
 
 			Dispatcher.BeginInvoke(() =>
@@ -316,8 +333,15 @@ namespace FastLoader
 			
 			// if it file exists in the storage then load it
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(navItem.LocalHystoryFileName))
+			{
 				//_currentPage = uriForNavigate;
 				browser.Navigate(navItem.LocalHystoryUri);
+				if (_isOpenHistory)
+				{
+					_history.Push(_currentPage as WebItem);
+					_currentPage = navItem;
+				}
+			}
 			else
 			{
 				_request = new HttpWebRequestIndicate(WebRequest.CreateHttp(navItem));
@@ -325,6 +349,12 @@ namespace FastLoader
 				_request.HttpRequest.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 				_request.BeginGetResponse(new AsyncCallback(HandleResponse), null);
 			}
+		}
+
+		public void OpenHistoryItem(Uri link)
+		{
+			_isOpenHistory = true;
+			Navigate(link);			
 		}
 
 		/// <summary>
@@ -350,11 +380,13 @@ namespace FastLoader
 				isFirstTime = false;
 			}
 			progressBar.IsIndeterminate = false;
+			_isOpenHistory = false;
 		}
 
 		private void browser_NavigationFailed(object sender, NavigationFailedEventArgs e)
 		{
 			progressBar.IsIndeterminate = false;
+			_isOpenHistory = false;
 		}
 
 		private void browser_Navigating(object sender, NavigatingEventArgs e)
@@ -363,8 +395,7 @@ namespace FastLoader
 			{
 				e.Cancel = true;
 				WebItem uriForNavigate = null;
-				//Debug.WriteLine(browser.Source);
-
+				
 				if (e.Uri.OriginalString.Contains("http"))
 				{
 					string clearUri = e.Uri.OriginalString.Remove(0, e.Uri.OriginalString.IndexOf("http"));
@@ -387,13 +418,14 @@ namespace FastLoader
 			}
 			else
 			{
-				if (_request == null || _nowIsPageRefreshing)
+				bool containCurrentPage = _history.Contains(_currentPage);
+				if ((_request == null && !containCurrentPage) || _nowIsPageRefreshing || _isOpenHistory)
 				{
 					_nowIsPageRefreshing = false;
 					return;
-				}				
+				}
 
-				if (!_history.Contains(_currentPage))
+				if (!containCurrentPage)
 				{
 					// if we navigating to new loaded page
 					_history.Push(_currentPage as WebItem);

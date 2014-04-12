@@ -30,6 +30,7 @@ namespace FastLoader.Extensions
 			foreach (string name in files)
 			{
 				//FileInfo f = new FileInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), name));
+				
 				IsolatedStorageFileStream fs = store.OpenFile(name, FileMode.Open, FileAccess.Read);
 				res += fs.Length;
 				fs.Close();

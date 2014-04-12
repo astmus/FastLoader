@@ -1,4 +1,4 @@
-﻿using FastLoader.Classes;
+﻿using FastLoader.DB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,29 +11,17 @@ namespace FastLoader.Data
 	{
 		public HistoryItemsByDate()
 		{
-			List<HistoryItem> items = new List<HistoryItem>();
-			DateTime d = DateTime.Now;
-			Random r = new Random();
-			for (int i = 0; i < 40; i++)
-			{
-				HistoryItem h = new HistoryItem();
-				h.Title = "Title" + i.ToString();
-				d = d.AddHours(8);
-				h.TimeOpening = d;
-				items.Insert(r.Next(0,items.Count),h);
-			}
-
-			Dictionary<DateTime, List<HistoryItem>> dates = (from item in items group item by item.TimeOpening.Date into custGroup
-															 orderby custGroup.Key.Date descending select custGroup).ToDictionary(g => g.Key,
-															 g => g.OrderByDescending(x=>x.TimeOpening.Date).ToList());
+			Dictionary<DateTime, List<HistoryItem>> dates = (from item in FSDBManager.Instance.History
+															 group item by item.OpenTime.Date).ToDictionary(g => g.Key,
+															 g => g.OrderByDescending(x => x.OpenTime).ToList());
+			
 			foreach (DateTime dt in dates.Keys)
 			{
 				ItemsGroup<HistoryItem> g = new ItemsGroup<HistoryItem>(dt.ToString("dd MMMM yyyy"));
 				g.AddRange(dates[dt]);
 				this.Add(g);
 			}
-			 
-
+			
 			//dates.Sort();
 			//dates.Reverse();
 		}

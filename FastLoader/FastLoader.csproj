@@ -94,8 +94,8 @@
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
     <Compile Include="Classes\HttpWebRequestIndicate.cs" />
-    <Compile Include="Classes\WebPage.cs" />
-    <Compile Include="Classes\HistoryItem.cs" />
+    <Compile Include="Classes\WebItem.cs" />
+    <Compile Include="DB\HistoryItem.cs" />
     <Compile Include="Data\HistoryItemsByDate.cs" />
     <Compile Include="Data\ItemsGroup.cs" />
     <Compile Include="DB\FSDBDataContext.cs" />
@@ -167,6 +167,7 @@
     <Content Include="Assets\ApplicationIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\favicon.ico" />
     <Content Include="Assets\Splash.png" />
     <Content Include="Assets\Tiles\FlipCycleTileLarge.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

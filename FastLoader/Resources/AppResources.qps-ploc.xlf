@@ -66,8 +66,28 @@
           <target state="new">report about bad page</target>
         </trans-unit>
         <trans-unit id="Resx/History" translate="yes" xml:space="preserve">
+          <source>Сache and History</source>
+          <target state="new">Сache and History</target>
+        </trans-unit>
+        <trans-unit id="Resx/Time" translate="yes" xml:space="preserve">
+          <source>Time:</source>
+          <target state="new">Time:</target>
+        </trans-unit>
+        <trans-unit id="Resx/HistoryTitle" translate="yes" xml:space="preserve">
           <source>History</source>
           <target state="new">History</target>
+        </trans-unit>
+        <trans-unit id="Resx/WillBeSoon" translate="yes" xml:space="preserve">
+          <source>will be soon</source>
+          <target state="new">will be soon</target>
+        </trans-unit>
+        <trans-unit id="Resx/CacheTitle" translate="yes" xml:space="preserve">
+          <source>Cache</source>
+          <target state="new">Cache</target>
+        </trans-unit>
+        <trans-unit id="Resx/Size" translate="yes" xml:space="preserve">
+          <source>Size:</source>
+          <target state="new">Size:</target>
         </trans-unit>
         <trans-unit translate="yes" id="Resx/RateApp" xml:space="preserve">
           <source>rate application</source>

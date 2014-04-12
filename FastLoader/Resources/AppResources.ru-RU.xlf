@@ -10,38 +10,32 @@
           <source>LeftToRight</source>
           <target state="translated">LeftToRight</target>
           <note from="MultilingualBuild" annotates="source" priority="2">Controls the FlowDirection for all elements in the RootFrame. Set to the traditional direction of this resource file's language</note>
-          
-        </trans-unit>
+          </trans-unit>
         <trans-unit id="Resx/ResourceLanguage" translate="yes" xml:space="preserve">
           <source>en-US</source>
           <target state="translated">ru-RU</target>
           <note from="MultilingualBuild" annotates="source" priority="2">Controls the Language and ensures that the font for all elements in the RootFrame aligns with the app's language. Set to the language code of this resource file's language.</note>
-          
-        </trans-unit>
+          </trans-unit>
         <trans-unit id="Resx/ExceptionMessage" translate="yes" xml:space="preserve">
           <source>Sorry, but open the page on this link fails</source>
           <target state="signed-off" state-qualifier="mt-suggestion">Извините, но открытые страницы по этой ссылке не удается</target>
           <note from="MultilingualBuild" annotates="source" priority="2">2</note>
-          
-        </trans-unit>
+          </trans-unit>
         <trans-unit id="Resx/ClearCacheMessage" translate="yes" xml:space="preserve">
           <source>Clear cache and delete all previously downloaded pages?</source>
           <target state="signed-off" state-qualifier="mt-suggestion">Очистить кэш и удалить все ранее загруженные страницы?</target>
           <note from="MultilingualBuild" annotates="source" priority="2">1</note>
-          
-        </trans-unit>
+          </trans-unit>
         <trans-unit id="Resx/ClearCacheMenuItem" translate="yes" xml:space="preserve">
           <source>clear cache</source>
           <target state="needs-review-translation">очистить кэш</target>
           <note from="MultilingualBuild" annotates="source" priority="2">3</note>
-          
-        </trans-unit>
+          </trans-unit>
         <trans-unit translate="yes" id="Resx/AboutText" xml:space="preserve">
           <source>Fast loading pages from internet and offline viewing.</source>
           <target state="translated">Быстрая загрузка страниц из интернета с последующим просмотром офлайн.</target>
           <note from="MultilingualBuild" annotates="source" priority="2">7</note>
-          
-        </trans-unit>
+          </trans-unit>
         <trans-unit translate="yes" id="Resx/Refresh" xml:space="preserve">
           <source>Refresh</source>
           <target state="translated">Обновить</target>
@@ -50,8 +44,7 @@
           <source>about</source>
           <target state="translated">о программе</target>
           <note from="MultilingualBuild" annotates="source" priority="2">9</note>
-          
-        </trans-unit>
+          </trans-unit>
         <trans-unit translate="yes" id="Resx/OpenInIE" xml:space="preserve">
           <source>Open in Internet Explorer</source>
           <target state="translated">Открыть в Internet Explorer</target>
@@ -73,15 +66,34 @@
           <target state="translated">неправильная страница</target>
         </trans-unit>
         <trans-unit id="Resx/History" translate="yes" xml:space="preserve">
+          <source>Сache and History</source>
+          <target state="translated">История и Кэш</target></trans-unit>
+        <trans-unit id="Resx/Time" translate="yes" xml:space="preserve">
+          <source>Time:</source>
+          <target state="needs-review-translation">Время:</target>
+          <note from="MultilingualUpdate" annotates="source" priority="2">Please verify the translation’s accuracy as the source string was updated after it was translated.</note>
+          </trans-unit>
+        <trans-unit id="Resx/HistoryTitle" translate="yes" xml:space="preserve">
           <source>History</source>
-          <target state="translated">История</target>
+          <target state="translated" state-qualifier="tm-suggestion">История</target>
         </trans-unit>
+        <trans-unit id="Resx/WillBeSoon" translate="yes" xml:space="preserve">
+          <source>will be soon</source>
+          <target state="needs-review-translation" state-qualifier="mt-suggestion">скоро будет</target>
+        </trans-unit>
+        <trans-unit id="Resx/CacheTitle" translate="yes" xml:space="preserve">
+          <source>Cache</source>
+          <target state="translated">Кэш</target>
+        </trans-unit>
+        <trans-unit id="Resx/Size" translate="yes" xml:space="preserve">
+          <source>Size:</source>
+          <target state="translated">Размер:</target>
+          </trans-unit>
         <trans-unit translate="yes" id="Resx/RateApp" xml:space="preserve">
           <source>rate application</source>
           <target state="translated">оценить приложение</target>
           <note from="MultilingualBuild" annotates="source" priority="2">5</note>
-          
-        </trans-unit>
+          </trans-unit>
       </group>
     </body>
   </file>

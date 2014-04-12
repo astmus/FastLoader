@@ -168,6 +168,21 @@
     <value>report about bad page</value>
   </data>
   <data name="History" xml:space="preserve">
+    <value>Сache and History</value>
+  </data>
+  <data name="Size" xml:space="preserve">
+    <value>Size:</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Time:</value>
+  </data>
+  <data name="CacheTitle" xml:space="preserve">
+    <value>Cache</value>
+  </data>
+  <data name="HistoryTitle" xml:space="preserve">
     <value>History</value>
+  </data>
+  <data name="WillBeSoon" xml:space="preserve">
+    <value>will be soon</value>
   </data>
 </root>

@@ -88,6 +88,15 @@ namespace FastLoader.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cache.
+        /// </summary>
+        public static string CacheTitle {
+            get {
+                return ResourceManager.GetString("CacheTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to clear cache.
         /// </summary>
         public static string ClearCacheMenuItem {
@@ -115,11 +124,20 @@ namespace FastLoader.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to History.
+        ///   Looks up a localized string similar to Сache and History.
         /// </summary>
         public static string History {
             get {
                 return ResourceManager.GetString("History", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to History.
+        /// </summary>
+        public static string HistoryTitle {
+            get {
+                return ResourceManager.GetString("HistoryTitle", resourceCulture);
             }
         }
         
@@ -192,6 +210,33 @@ namespace FastLoader.Resources {
         public static string SettingsSaveCompletions {
             get {
                 return ResourceManager.GetString("SettingsSaveCompletions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Size:.
+        /// </summary>
+        public static string Size {
+            get {
+                return ResourceManager.GetString("Size", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time:.
+        /// </summary>
+        public static string Time {
+            get {
+                return ResourceManager.GetString("Time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to will be soon.
+        /// </summary>
+        public static string WillBeSoon {
+            get {
+                return ResourceManager.GetString("WillBeSoon", resourceCulture);
             }
         }
     }

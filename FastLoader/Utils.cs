@@ -6,11 +6,18 @@ using System.Threading.Tasks;
 using MSPToolkit.Encodings;
 using System.IO;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace FastLoader
 {
 	static class Utils
 	{
+		public static string GetTitleFromHtmlPage(string pageContent)
+		{
+			return Regex.Match(pageContent, "<title>(.*?)</title>").Groups[1].Value;
+		}
+
+
 		private static string format = "0.00";
 		public static string ConvertCountBytesToString(long value)
 		{
