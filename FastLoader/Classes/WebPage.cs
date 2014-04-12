@@ -18,16 +18,22 @@ namespace FastLoader.Classes
 			_invalidChars = Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).Concat(new []{'#'}).ToArray();
 		}
 
-		public WebItem(string uriString, UriKind uriKind)
-			: base(uriString, uriKind)
+		public WebItem(string uriString, long size)
+			: base(uriString, UriKind.RelativeOrAbsolute)
+		{
+			Size = size;
+		}
+				
+		public WebItem(Uri uri)
+			: base(uri.OriginalString, UriKind.Absolute)
 		{
 
 		}
 
-		public WebItem(Uri uri)
-			: base(uri.OriginalString, uri.IsAbsoluteUri ? UriKind.Absolute : UriKind.Relative)
+		public long Size
 		{
-
+			get;
+			set;
 		}
 
 		string _localHystoryFileName;
@@ -63,7 +69,7 @@ namespace FastLoader.Classes
                 if (_localHistoryItem == null)
                 {
                     string res = LocalHystoryFileName;
-                    return new WebItem(res, UriKind.Relative);
+                    return new WebItem(res, this.Size);
                 }
                 return _localHistoryItem;
 			}
@@ -76,18 +82,19 @@ namespace FastLoader.Classes
 		{
 			get
 			{
-				return _startPage ?? (_startPage = new WebItem(START_PAGE, UriKind.Relative));
+				return _startPage ?? (_startPage = new WebItem(START_PAGE, 0));
 			}
 		}
 
 		static WebItem _googlePage;
-		public static WebItem GooglePage
+		public static Uri GooglePage
 		{
 			get
 			{
-				return _googlePage ?? (_googlePage = new WebItem("https://www.google.com", UriKind.Absolute));
+				return _googlePage ?? (_googlePage = new WebItem("https://www.google.com",0));
 			}
 		}
+
 #endregion
 	}
 }

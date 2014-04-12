@@ -98,6 +98,7 @@
     <Compile Include="Classes\HistoryItem.cs" />
     <Compile Include="Data\HistoryItemsByDate.cs" />
     <Compile Include="Data\ItemsGroup.cs" />
+    <Compile Include="DB\FSDBDataContext.cs" />
     <Compile Include="History.xaml.cs">
       <DependentUpon>History.xaml</DependentUpon>
     </Compile>

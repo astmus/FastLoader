@@ -6,19 +6,14 @@ using System.Threading.Tasks;
 
 namespace FastLoader.Classes
 {
-	public class HistoryItem : WebItem
+	public class HistoryItem
 	{
 		public Uri Link { get; set; }
 		public DateTime TimeOpening { get; set; }
 		public Uri Favicon { get; set; }
 		public String Title { get; set; }
 
-		public HistoryItem(WebItem item) : base (item.OriginalString, item.IsAbsoluteUri? UriKind.Absolute : UriKind.Relative)
-		{
-
-		}
-
-		public HistoryItem() : base("",UriKind.Relative)
+		public HistoryItem()
 		{
 
 		}

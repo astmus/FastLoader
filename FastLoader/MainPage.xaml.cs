@@ -36,8 +36,8 @@ namespace FastLoader
 		HttpWebRequestIndicate _request;
 		string _currentDomain;
 		//string _currentFileName;
-		WebItem _currentPage;
-		Stack<HistoryItem> _hystory = new Stack<HistoryItem>();
+		Uri _currentPage;
+		Stack<WebItem> _history = new Stack<WebItem>();
 		ObservableCollection<string> _completions = new ObservableCollection<string>();
 		bool _nowIsPageRefreshing = false;
 		//Stack<DomainPagesCount> _domains = new Stack<DomainPagesCount>();
@@ -63,7 +63,7 @@ namespace FastLoader
 				using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
 				{
 					isf.Remove();
-					_hystory.Clear();
+					_history.Clear();
 					_currentPage = WebItem.StartPage;
 					browser.Navigate(_currentPage);
 				}
@@ -133,12 +133,12 @@ namespace FastLoader
 				return;
 			}
 
-			if (_hystory.Count > 0)
+			if (_history.Count > 0)
 			{
 				e.Cancel = true;
 				// Pop pages from history occur in browser_Navigating method because 
 				// there we check navigating to new page or back to previous
-				WebItem previousPage = _hystory.Peek();
+				WebItem previousPage = _history.Peek();
 				_currentPage = previousPage;
 				browser.Navigate(previousPage.LocalHystoryUri);
 			}
@@ -269,12 +269,13 @@ namespace FastLoader
 				content = Regex.Replace(content, "<form action=\"/search.*form>", "");
 
 			RemoveImgTagsFromPage(ref content);
-
-			string fileName = (_request.HttpRequest.RequestUri as WebItem).LocalHystoryFileName;
-			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(fileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
+			WebItem item = _request.HttpRequest.RequestUri as WebItem;			
+			
+			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(item.LocalHystoryFileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
 			{
 				StreamWriter sw = new StreamWriter(savefilestr);
 				sw.Write(content);
+				item.Size = savefilestr.Length;
 				savefilestr.Close();
 			}
 
@@ -282,7 +283,7 @@ namespace FastLoader
 
 			Dispatcher.BeginInvoke(() =>
 			{
-				browser.Navigate(new Uri(fileName, UriKind.Relative));
+				browser.Navigate(item.LocalHystoryUri);
 			});
 		}
 
@@ -307,20 +308,23 @@ namespace FastLoader
 		/// Load page from url to isolated storage and navigate to it
 		/// </summary>
 		/// <param name="link"></param>
-		void Navigate(WebItem link)
+		void Navigate(Uri link)
 		{
 			this.Focus();
 			progressBar.IsIndeterminate = true;
-			_request = new HttpWebRequestIndicate(WebRequest.CreateHttp(link));
-			_request.HttpRequest.AllowReadStreamBuffering = false;
-			_request.HttpRequest.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
-
+			WebItem navItem = link is WebItem ? link as WebItem : new WebItem(link);
+			
 			// if it file exists in the storage then load it
-			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(link.LocalHystoryFileName))
+			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(navItem.LocalHystoryFileName))
 				//_currentPage = uriForNavigate;
-				browser.Navigate(link.LocalHystoryUri);
+				browser.Navigate(navItem.LocalHystoryUri);
 			else
+			{
+				_request = new HttpWebRequestIndicate(WebRequest.CreateHttp(navItem));
+				_request.HttpRequest.AllowReadStreamBuffering = false;
+				_request.HttpRequest.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 				_request.BeginGetResponse(new AsyncCallback(HandleResponse), null);
+			}
 		}
 
 		/// <summary>
@@ -329,7 +333,7 @@ namespace FastLoader
 		/// <param name="search"></param>
 		void Search(string search)
 		{
-			WebItem uriForSearch = new WebItem(GOOGLE_SEARCH_DOMAIN + search, UriKind.Absolute);
+			Uri uriForSearch = new Uri(GOOGLE_SEARCH_DOMAIN + search, UriKind.Absolute);
 			Navigate(uriForSearch);
 		}
 
@@ -364,7 +368,7 @@ namespace FastLoader
 				if (e.Uri.OriginalString.Contains("http"))
 				{
 					string clearUri = e.Uri.OriginalString.Remove(0, e.Uri.OriginalString.IndexOf("http"));
-					uriForNavigate = new WebItem(HttpUtility.UrlDecode(clearUri), UriKind.Absolute);
+					uriForNavigate = new WebItem(HttpUtility.UrlDecode(clearUri), 0);
 					if (uriForNavigate.OriginalString.Contains("ei") &&
 						uriForNavigate.OriginalString.Contains("sa") &&
 						uriForNavigate.OriginalString.Contains("ved") &&
@@ -376,7 +380,7 @@ namespace FastLoader
 				{
 					string ump = e.Uri.OriginalString[0] != '/' ? "/" : "" ;
 					string s = _currentDomain + ump + e.Uri.OriginalString;
-					uriForNavigate = new WebItem(HttpUtility.UrlDecode(s), UriKind.Absolute);
+					uriForNavigate = new WebItem(HttpUtility.UrlDecode(s), 0);
 				}
 
 				Navigate(uriForNavigate);
@@ -389,16 +393,16 @@ namespace FastLoader
 					return;
 				}				
 
-				if (!_hystory.Contains(_currentPage))
+				if (!_history.Contains(_currentPage))
 				{
 					// if we navigating to new loaded page
-					_hystory.Push(new HistoryItem(_currentPage));
+					_history.Push(_currentPage as WebItem);
 					_currentPage = _request.HttpRequest.RequestUri as WebItem;
 				}
 				else
 				{
 					// if we step back by history
-					_currentPage = _hystory.Pop();
+					_currentPage = _history.Pop();
 					if (_currentPage != WebItem.StartPage)
 						SetCurrentDomainFromUrl(_currentPage);
 					else
@@ -474,7 +478,7 @@ namespace FastLoader
 
 		void RefreshCurrentPage(object sender, EventArgs e)
 		{
-			string filename = _currentPage.LocalHystoryFileName;
+			string filename = (_currentPage as WebItem).LocalHystoryFileName;
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(filename))
 			{
 				IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(filename);
