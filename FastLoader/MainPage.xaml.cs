@@ -41,7 +41,6 @@ namespace FastLoader
 		Stack<WebItem> _history = new Stack<WebItem>();
 		ObservableCollection<string> _completions = new ObservableCollection<string>();
 		bool _nowIsPageRefreshing = false;
-		bool _isOpenHistory = false;
 		//Stack<DomainPagesCount> _domains = new Stack<DomainPagesCount>();
 		//Dictionary<Uri, String> _uriFileNames = new Dictionary<Uri, string>();
 		public MainPage()
@@ -325,7 +324,7 @@ namespace FastLoader
 		/// Load page from url to isolated storage and navigate to it
 		/// </summary>
 		/// <param name="link"></param>
-		void Navigate(Uri link)
+		public void Navigate(Uri link)
 		{
 			this.Focus();
 			progressBar.IsIndeterminate = true;
@@ -333,15 +332,8 @@ namespace FastLoader
             _request = new HttpWebRequestIndicate(WebRequest.CreateHttp(navItem));
 			// if it file exists in the storage then load it
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(navItem.LocalHystoryFileName))
-			{
 				//_currentPage = uriForNavigate;
 				browser.Navigate(navItem.LocalHystoryUri);
-				if (_isOpenHistory)
-				{
-					_history.Push(_currentPage as WebItem);
-					_currentPage = navItem;
-				}
-			}
 			else
 			{
 				
@@ -349,12 +341,6 @@ namespace FastLoader
 				_request.HttpRequest.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 				_request.BeginGetResponse(new AsyncCallback(HandleResponse), null);
 			}
-		}
-
-		public void OpenHistoryItem(Uri link)
-		{
-			_isOpenHistory = true;
-			Navigate(link);			
 		}
 
 		/// <summary>
@@ -380,13 +366,11 @@ namespace FastLoader
 				isFirstTime = false;
 			}
 			progressBar.IsIndeterminate = false;
-			_isOpenHistory = false;
 		}
 
 		private void browser_NavigationFailed(object sender, NavigationFailedEventArgs e)
 		{
 			progressBar.IsIndeterminate = false;
-			_isOpenHistory = false;
 		}
 
 		private void browser_Navigating(object sender, NavigatingEventArgs e)
@@ -418,7 +402,7 @@ namespace FastLoader
 			}
 			else
 			{				
-				if (_request == null || _nowIsPageRefreshing || _isOpenHistory)
+				if (_request == null || _nowIsPageRefreshing)
 				{
 					_nowIsPageRefreshing = false;
 					return;

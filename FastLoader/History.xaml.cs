@@ -40,7 +40,7 @@ namespace FastLoader
 		{
 			base.OnNavigatedFrom(e);
 			if (_item != null)
-				(e.Content as MainPage).OpenHistoryItem(new Uri(_item.Link,UriKind.Absolute));			
+				(e.Content as MainPage).Navigate(new Uri(_item.Link,UriKind.Absolute));			
 
 		}
 	}
