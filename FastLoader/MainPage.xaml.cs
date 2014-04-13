@@ -41,8 +41,6 @@ namespace FastLoader
 		Stack<WebItem> _history = new Stack<WebItem>();
 		ObservableCollection<string> _completions = new ObservableCollection<string>();
 		bool _nowIsPageRefreshing = false;
-		//Stack<DomainPagesCount> _domains = new Stack<DomainPagesCount>();
-		//Dictionary<Uri, String> _uriFileNames = new Dictionary<Uri, string>();
 		public MainPage()
 		{
 			InitializeComponent();
@@ -144,7 +142,7 @@ namespace FastLoader
 				WebItem previousPage = _history.Peek();
 				_currentPage = previousPage;
 				browser.Navigate(previousPage.LocalHystoryUri);
-			}
+			}			
 		}
 
 		private void TextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
@@ -283,7 +281,7 @@ namespace FastLoader
 			}
 
 			//add item to persist history
-			HistoryItem historyItem = new HistoryItem()
+			CachedItem cachedItem = new CachedItem()
 			{
 				Link = item.OriginalString,
 				Size = item.Size,
@@ -291,9 +289,9 @@ namespace FastLoader
 				Title = Utils.GetTitleFromHtmlPage(content),
 				FormatedSize = Utils.ConvertCountBytesToString(item.Size)
 			};
-
-			FSDBManager.Instance.History.InsertOnSubmit(historyItem);
-			FSDBManager.Instance.SubmitChanges();
+			
+			FSDBManager.Instance.Cache.InsertOnSubmit(cachedItem);
+			FSDBManager.Instance.SubmitChanges();			
 
 			sourceStream.Dispose();
 
@@ -335,12 +333,12 @@ namespace FastLoader
 				//_currentPage = uriForNavigate;
 				browser.Navigate(navItem.LocalHystoryUri);
 			else
-			{
-				
+			{				
 				_request.HttpRequest.AllowReadStreamBuffering = false;
 				_request.HttpRequest.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 				_request.BeginGetResponse(new AsyncCallback(HandleResponse), null);
 			}
+			
 		}
 
 		/// <summary>
@@ -365,6 +363,8 @@ namespace FastLoader
 				}, TimeSpan.FromMilliseconds(500));
 				isFirstTime = false;
 			}
+			
+			AddHistoryItemToStorage();
 			progressBar.IsIndeterminate = false;
 		}
 
@@ -411,7 +411,7 @@ namespace FastLoader
 				if (!containCurrentPage)
 				{
 					// if we navigating to new loaded page
-					_history.Push(_currentPage as WebItem);
+					_history.Push( _currentPage as WebItem);					
 					_currentPage = _request.HttpRequest.RequestUri as WebItem;
 				}
 				else
@@ -424,6 +424,22 @@ namespace FastLoader
 						_currentDomain = "";
 				}
 			}
+		}
+
+		void AddHistoryItemToStorage()
+		{
+			if (_request == null || _currentPage == WebItem.StartPage) return;
+			WebItem current = _currentPage as WebItem;
+			var tmp = FSDBManager.Instance.Cache.Where(cach => cach.Link == current.OriginalString).FirstOrDefault();
+			HistoryItem hitem = new HistoryItem()
+			{
+				OpenTime = DateTime.Now,
+				Link = current.OriginalString,
+				Title = tmp.Title
+			};
+
+			FSDBManager.Instance.History.InsertOnSubmit(hitem);
+			FSDBManager.Instance.SubmitChanges();
 		}
 
 		void SetCurrentDomainFromUrl(Uri navigateUrl)

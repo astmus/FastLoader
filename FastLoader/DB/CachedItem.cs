@@ -8,12 +8,14 @@ using FastLoader.Interfaces;
 
 namespace FastLoader.DB
 {
-	[global::System.Data.Linq.Mapping.TableAttribute(Name = "HistoryDates")]
-	public class HistoryItem : IWebItem
+	[global::System.Data.Linq.Mapping.TableAttribute(Name = "CacheItems")]
+	public class CachedItem : IWebItem
 	{
-		[Column(Storage = "HistoryItemId", AutoSync = AutoSync.OnInsert, IsPrimaryKey = true, IsDbGenerated = true)]
-		public int HistoryItemId { get; set; }
+		public CachedItem()
+		{
 
+		}
+		
 		[Column(Storage = "Link", CanBeNull = false)]
 		public String Link { get; set; }
 
@@ -39,6 +41,20 @@ namespace FastLoader.DB
 			{
 				_fav = value;
 			}
+		}
+
+		[Column(Storage = "CachedItemId", AutoSync = AutoSync.OnInsert, IsPrimaryKey = true, IsDbGenerated = true)]
+		public int CachedItemId { get; set; }
+		
+		[Column(Storage = "FormatedSize", CanBeNull = false)]
+		public string FormatedSize { get; set; }
+
+		[Column(Storage = "Size", CanBeNull = false)]
+		public long Size { get; set; }
+
+		public override string ToString()
+		{
+			return Title + " " + OpenTime.ToString("yyyy.MM.dd HH:mm:ss");
 		}
 	}
 }

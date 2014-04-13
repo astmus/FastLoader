@@ -16,7 +16,6 @@
     shell:SystemTray.IsVisible="True">
 
     <phone:PhoneApplicationPage.Resources>
-        <data2:HistoryItemsByDate x:Key="dates"/>
         <Style TargetType="phone:LongListSelector" x:Key="BuddiesJumpListStyle">
             <Setter Property="LayoutMode" Value="List"/>
             <Setter Property="ItemTemplate">
@@ -79,12 +78,11 @@
         </Grid.RowDefinitions>
         <!--<TextBlock Margin="12,10,0,10" Grid.Row="0" Text="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>-->
         <phone:Pivot Title="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}"
-                     x:Name="MainPivot"
+                     x:Name="MainPivot" SelectionChanged="SelectionChanged"
                     >
             <phone:PivotItem Header="{Binding Path=LocalizedResources.CacheTitle, Source={StaticResource LocalizedStrings}}"  x:Name="CacheItem">
-        <toolkit:LongListMultiSelector x:Name="history" Background="Transparent"
+        <toolkit:LongListMultiSelector x:Name="cache" Background="Transparent"
                                                 Margin="0,-8,0,0"
-                                                ItemsSource="{StaticResource dates}"
                                                 LayoutMode="List"
                                                 IsGroupingEnabled="True"
                                                 HideEmptyGroups="True"
@@ -94,7 +92,14 @@
             />
                 </phone:PivotItem>
             <phone:PivotItem Header="{Binding Path=LocalizedResources.HistoryTitle, Source={StaticResource LocalizedStrings}}"  x:Name="HistoryItem">
-                <TextBlock Margin="12" Style="{StaticResource PhoneTextLargeStyle}"  Text="{Binding Path=LocalizedResources.WillBeSoon, Source={StaticResource LocalizedStrings}}"/>
+                <toolkit:LongListMultiSelector x:Name="history" Background="Transparent"
+                                                Margin="0,-8,0,0"                                                
+                                                LayoutMode="List"
+                                                IsGroupingEnabled="True"
+                                                HideEmptyGroups="True"
+                                                JumpListStyle="{StaticResource BuddiesJumpListStyle}"
+                                                GroupHeaderTemplate="{StaticResource BuddiesGroupHeaderTemplate}"
+                                                ItemTemplate="{StaticResource BuddiesItemTemplate}"/>
             </phone:PivotItem>
             </phone:Pivot>
         <!---->

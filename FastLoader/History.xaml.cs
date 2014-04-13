@@ -8,12 +8,15 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using FastLoader.DB;
+using System.Diagnostics;
+using FastLoader.Data;
+using FastLoader.Interfaces;
 
 namespace FastLoader
 {
 	public partial class History : PhoneApplicationPage
 	{
-		HistoryItem _item;
+		IWebItem _item;
 		public History()
 		{
 			InitializeComponent();
@@ -21,6 +24,18 @@ namespace FastLoader
 
 		private void SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
+			switch (MainPivot.SelectedIndex)
+			{
+				case 0:
+					if (cache.ItemsSource == null)
+						cache.ItemsSource = FSDBManager.Instance.GetSortedItems<CachedItem>();
+					break;
+				case 1:
+					if (history.ItemsSource == null)
+						history.ItemsSource = FSDBManager.Instance.GetSortedItems<HistoryItem>();
+					break;
+			}
+			
 			
 		}
 
@@ -32,7 +47,7 @@ namespace FastLoader
 
 		private void Grid_Tap(object sender, System.Windows.Input.GestureEventArgs e)
 		{
-			_item = (sender as FrameworkElement).DataContext as HistoryItem;
+			_item = (sender as FrameworkElement).DataContext as IWebItem;
 			NavigationService.GoBack();
 		}
 

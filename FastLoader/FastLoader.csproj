@@ -95,13 +95,14 @@
     <Compile Include="AppSettings.cs" />
     <Compile Include="Classes\HttpWebRequestIndicate.cs" />
     <Compile Include="Classes\WebItem.cs" />
-    <Compile Include="DB\HistoryItem.cs" />
-    <Compile Include="Data\HistoryItemsByDate.cs" />
+    <Compile Include="DB\CachedItem.cs" />
     <Compile Include="Data\ItemsGroup.cs" />
     <Compile Include="DB\FSDBDataContext.cs" />
+    <Compile Include="DB\HistoryItem.cs" />
     <Compile Include="History.xaml.cs">
       <DependentUpon>History.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IOpenTimeHave.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
