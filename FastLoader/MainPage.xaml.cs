@@ -307,7 +307,7 @@ namespace FastLoader
 		string GetCharsetFromContent(string content)
 		{
 			//return Regex.Match(content, "<meta.+?charset=([^\";']+)").Groups[1].Value;
-			return Regex.Match(content, "<meta.+?charset=\"?(.+?)[\";]").Groups[1].Value;
+			return Regex.Match(content, "<meta.+?charset=\"?(.+?)[\";']").Groups[1].Value;
 		}
 
 		string GetCharsetFromHeaders(HttpWebResponse response)
@@ -330,7 +330,7 @@ namespace FastLoader
 			this.Focus();
 			progressBar.IsIndeterminate = true;
 			WebItem navItem = link is WebItem ? link as WebItem : new WebItem(link);
-			
+            _request = new HttpWebRequestIndicate(WebRequest.CreateHttp(navItem));
 			// if it file exists in the storage then load it
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(navItem.LocalHystoryFileName))
 			{
@@ -344,7 +344,7 @@ namespace FastLoader
 			}
 			else
 			{
-				_request = new HttpWebRequestIndicate(WebRequest.CreateHttp(navItem));
+				
 				_request.HttpRequest.AllowReadStreamBuffering = false;
 				_request.HttpRequest.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 				_request.BeginGetResponse(new AsyncCallback(HandleResponse), null);
@@ -417,14 +417,13 @@ namespace FastLoader
 				Navigate(uriForNavigate);
 			}
 			else
-			{
-				bool containCurrentPage = _history.Contains(_currentPage);
-				if ((_request == null && !containCurrentPage) || _nowIsPageRefreshing || _isOpenHistory)
+			{				
+				if (_request == null || _nowIsPageRefreshing || _isOpenHistory)
 				{
 					_nowIsPageRefreshing = false;
 					return;
 				}
-
+                bool containCurrentPage = _history.Contains(_currentPage);
 				if (!containCurrentPage)
 				{
 					// if we navigating to new loaded page
