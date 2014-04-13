@@ -50,6 +50,22 @@
                 </Border>
             </Border>
         </DataTemplate>
+        <DataTemplate x:Key="HistoryItemTemplate">
+            <Grid toolkit:TiltEffect.IsTiltEnabled="True" Tap="Grid_Tap"  Margin="12,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image CacheMode="BitmapCache"  Width="64" Height="64" Source="{Binding Favicon}" VerticalAlignment="Top" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Top">
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource PhoneTextNormalStyle}" TextWrapping="Wrap" FontFamily="{StaticResource PhoneFontFamilySemiBold}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Path=LocalizedResources.Time, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextSmallStyle}"/>
+                        <TextBlock Text="{Binding OpenTime, StringFormat='{}{0:HH:mm}'}" Style="{StaticResource PhoneTextSmallStyle}" FontFamily="{StaticResource PhoneFontFamilySemiBold}"/>
+                    </StackPanel>                    
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
         <DataTemplate x:Key="BuddiesItemTemplate">
             <Grid toolkit:TiltEffect.IsTiltEnabled="True" Tap="Grid_Tap"  Margin="12,0,0,8">
                 <Grid.ColumnDefinitions>
@@ -89,6 +105,8 @@
                                                 JumpListStyle="{StaticResource BuddiesJumpListStyle}"
                                                 GroupHeaderTemplate="{StaticResource BuddiesGroupHeaderTemplate}"
                                                 ItemTemplate="{StaticResource BuddiesItemTemplate}"                                       
+                                       IsSelectionEnabledChanged="history_IsSelectionEnabledChanged"
+                                       SelectionChanged="cache_SelectionChanged"
             />
                 </phone:PivotItem>
             <phone:PivotItem Header="{Binding Path=LocalizedResources.HistoryTitle, Source={StaticResource LocalizedStrings}}"  x:Name="HistoryItem">
@@ -99,7 +117,10 @@
                                                 HideEmptyGroups="True"
                                                 JumpListStyle="{StaticResource BuddiesJumpListStyle}"
                                                 GroupHeaderTemplate="{StaticResource BuddiesGroupHeaderTemplate}"
-                                                ItemTemplate="{StaticResource BuddiesItemTemplate}"/>
+                                                ItemTemplate="{StaticResource HistoryItemTemplate}"
+                                               IsSelectionEnabledChanged="history_IsSelectionEnabledChanged"
+                                               SelectionChanged="SelectionChanged"
+                                               />
             </phone:PivotItem>
             </phone:Pivot>
         <!---->
@@ -115,5 +136,11 @@
                 </phone:PivotItem>
             </phone:Pivot>-->
     </Grid>
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar>
+            <shell:ApplicationBar.MenuItems>
 
+            </shell:ApplicationBar.MenuItems>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
 </phone:PhoneApplicationPage>
