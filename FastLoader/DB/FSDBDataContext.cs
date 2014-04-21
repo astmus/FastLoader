@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FastLoader.Interfaces;
+using System.Collections.ObjectModel;
 
 namespace FastLoader.DB
 {
@@ -26,16 +27,15 @@ namespace FastLoader.DB
         }
 
 
-		public List<ItemsGroup<T>> GetSortedItems<T>() where T : class, IWebItem
+		public ObservableCollection<ItemsGroup<T>> GetSortedItems<T>() where T : class, IWebItem
 		{
-			List<ItemsGroup<T>> res = new List<ItemsGroup<T>>();
+			ObservableCollection<ItemsGroup<T>> res = new ObservableCollection<ItemsGroup<T>>();
 			Dictionary<DateTime, List<T>> dates = (from item in FSDBManager.Instance.GetTable<T>()
 															group item by item.OpenTime.Date).ToDictionary(g => g.Key,
 															 g => g.OrderByDescending(x => x.OpenTime).ToList());
 			foreach (DateTime dt in dates.Keys)
 			{
-				ItemsGroup<T> g = new ItemsGroup<T>(dt.ToString("dd MMMM yyyy"));
-				g.AddRange(dates[dt]);
+				ItemsGroup<T> g = new ItemsGroup<T>(dt.ToString("dd MMMM yyyy"), dates[dt]);
 				res.Insert(0, g);
 			}
 			return res;

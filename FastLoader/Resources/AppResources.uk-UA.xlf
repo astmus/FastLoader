@@ -80,6 +80,10 @@
           <source>will be soon</source>
           <target state="signed-off" state-qualifier="mt-suggestion">буде найближчим часом</target>
         </trans-unit>
+        <trans-unit id="Resx/ClearHistory" translate="yes" xml:space="preserve">
+          <source>Clear all history</source>
+          <target state="translated">Очистити історію</target>
+        </trans-unit>
         <trans-unit id="Resx/CacheTitle" translate="yes" xml:space="preserve">
           <source>Cache</source>
           <target state="signed-off" state-qualifier="tm-suggestion">Кеш</target>

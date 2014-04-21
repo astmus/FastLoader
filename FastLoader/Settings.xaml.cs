@@ -12,9 +12,7 @@ using Microsoft.Phone.Tasks;
 namespace FastLoader
 {
 	public partial class SettingsPage : PhoneApplicationPage
-	{
-		public static event Action ClearCachePressed;
-
+	{		
 		public SettingsPage()
 		{
 			this.DataContext = AppSettings.Instance;
@@ -26,12 +24,6 @@ namespace FastLoader
 		{
 			MarketplaceReviewTask marketplaceReviewTask = new MarketplaceReviewTask();
 			marketplaceReviewTask.Show();
-		}
-
-		private void Button_Click_1(object sender, RoutedEventArgs e)
-		{
-			if (ClearCachePressed != null)
-				ClearCachePressed();
 		}
 	}
 }

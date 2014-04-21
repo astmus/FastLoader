@@ -185,4 +185,7 @@
   <data name="WillBeSoon" xml:space="preserve">
     <value>will be soon</value>
   </data>
+  <data name="ClearHistory" xml:space="preserve">
+    <value>Clear all history</value>
+  </data>
 </root>

@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FastLoader.Data
 {
-	public class ItemsGroup<T> : List<T>
+	public class ItemsGroup<T> : ObservableCollection<T>
 	{
-		public ItemsGroup(string category)
+		public ItemsGroup(string category, IList<T> items) : base(items)
         {
             Key = category;
         }

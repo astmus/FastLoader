@@ -12,6 +12,13 @@ using System.Diagnostics;
 using FastLoader.Data;
 using FastLoader.Interfaces;
 using System.Collections;
+using System.Collections.ObjectModel;
+using System.IO.IsolatedStorage;
+using FastLoader.Classes;
+using FastLoader.Resources;
+using FastLoader.Extensions;
+using Windows.Phone.System;
+using System.IO;
 
 namespace FastLoader
 {
@@ -20,6 +27,9 @@ namespace FastLoader
 		IWebItem _item;
 		ApplicationBarIconButton select;
 		ApplicationBarIconButton delete;
+		ApplicationBarIconButton deleteAll;
+		LongListMultiSelector _currentList;
+		public static event Action CacheCleared;
 		public History()
 		{
 			InitializeComponent();
@@ -28,15 +38,19 @@ namespace FastLoader
 
 		private void SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
+			if (_currentList != null)
+				_currentList.IsSelectionEnabled = false;
 			switch (MainPivot.SelectedIndex)
 			{
 				case 0:
 					if (cache.ItemsSource == null)
 						cache.ItemsSource = FSDBManager.Instance.GetSortedItems<CachedItem>();
+					_currentList = cache;
 					break;
 				case 1:
 					if (history.ItemsSource == null)
 						history.ItemsSource = FSDBManager.Instance.GetSortedItems<HistoryItem>();
+					_currentList = history;
 					break;
 			}				
 		}
@@ -53,13 +67,60 @@ namespace FastLoader
 			delete.Text = "delete";
 			delete.Click += OnDeleteClick;
 			ApplicationBar.Buttons.Add(select);
+			deleteAll = new ApplicationBarIconButton();
+			deleteAll.IconUri = new Uri("Assets/cancel.png", UriKind.RelativeOrAbsolute);
+			deleteAll.Text = "delete all";
+			deleteAll.Click += deleteAll_Click;
+			ApplicationBar.Buttons.Add(deleteAll);
+		}
+
+		void deleteAll_Click(object sender, EventArgs e)
+		{
+			if (_currentList == cache)
+				ClearCache();
+			else
+				ClearHistory();
+		}
+
+		void ClearCache()
+		{
+			FSDBManager.Instance.Dispose();
+			FSDBManager.Instance = null;
+			long size = (FSDBManager.Instance.Cache.Count() > 0) ? FSDBManager.Instance.Cache.Sum(item => item.Size) : 0;
+			if (MessageBox.Show(AppResources.ClearCacheMessage + " ( " + Utils.ConvertCountBytesToString(size) + " )", "", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+			{
+				using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
+				{
+					List<string> files = isf.GetAllFiles();					
+					foreach (string path in files)
+						if (!path.Contains(".sdf") && !path.Contains("__ApplicationSettings") && !path.Contains(".tmp"))
+							isf.DeleteFile(path);
+				}				
+				FSDBManager.Instance.Cache.DeleteAllOnSubmit(FSDBManager.Instance.Cache);
+				FSDBManager.Instance.SubmitChanges();
+				cache.ItemsSource = null;
+				if (CacheCleared != null)
+					CacheCleared();
+			}			
+		}
+
+		void ClearHistory()
+		{
+			if (MessageBox.Show(AppResources.ClearHistory, "", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+			{
+				FSDBManager.Instance.History.DeleteAllOnSubmit(FSDBManager.Instance.History);
+				FSDBManager.Instance.SubmitChanges();
+				history.ItemsSource = null;
+				if (CacheCleared != null)
+					CacheCleared();
+			}
 		}
 
 		private void SetupEmailApplicationBar()
 		{
 			ClearApplicationBar();
 
-			if (cache.IsSelectionEnabled)
+			if (_currentList.IsSelectionEnabled)
 			{
 				ApplicationBar.Buttons.Add(delete);
 				UpdateApplicationBar();
@@ -67,15 +128,16 @@ namespace FastLoader
 			else
 			{
 				ApplicationBar.Buttons.Add(select);
+				ApplicationBar.Buttons.Add(deleteAll);
 			}
 			ApplicationBar.IsVisible = true;
 		}
 
 		private void UpdateApplicationBar()
 		{
-			if (cache.IsSelectionEnabled)
+			if (_currentList.IsSelectionEnabled)
 			{
-				bool hasSelection = ((cache.SelectedItems != null) && (cache.SelectedItems.Count > 0));
+				bool hasSelection = ((_currentList.SelectedItems != null) && (_currentList.SelectedItems.Count > 0));
 				delete.IsEnabled = hasSelection;				
 			}
 		}
@@ -90,16 +152,37 @@ namespace FastLoader
 
 		void OnDeleteClick(object sender, EventArgs e)
 		{
-			IList source = cache.ItemsSource as IList;
-			while (cache.SelectedItems.Count > 0)
+			for (int i = 0; i < _currentList.SelectedItems.Count; i++)
 			{
-				source.Remove((CachedItem)cache.SelectedItems[0]);
+				IWebItem item = _currentList.SelectedItems[i] as IWebItem;
+				if (item is CachedItem)
+				{
+					CachedItem cacheItem = item as CachedItem;
+					DeleteItem<CachedItem>(cacheItem);
+					FSDBManager.Instance.Cache.DeleteOnSubmit(cacheItem);
+					string isoFileName = WebItem.LocalHystoryFileNameFromUrlString(cacheItem.Link);
+					IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(isoFileName);
+				}
+				else
+				{
+					DeleteItem<HistoryItem>(item as HistoryItem);
+					FSDBManager.Instance.History.DeleteOnSubmit(item as HistoryItem);
+				}
+				FSDBManager.Instance.SubmitChanges();
 			}
+			_currentList.IsSelectionEnabled = false;
+		}
+
+		void DeleteItem<T>(T item) where T :class, IWebItem
+		{
+			var groups = _currentList.ItemsSource as ObservableCollection<ItemsGroup<T>>;
+			ItemsGroup<T> group = groups.Where(g => g.Key == item.OpenTime.Date.ToString("dd MMMM yyyy")).FirstOrDefault() as ItemsGroup<T>;
+			group.Remove(item);			
 		}
 
 		void OnSelectClick(object sender, EventArgs e)
 		{
-			cache.IsSelectionEnabled = true;
+			_currentList.IsSelectionEnabled = true;
 		}
 
 		private void Grid_Tap(object sender, System.Windows.Input.GestureEventArgs e)
@@ -116,17 +199,17 @@ namespace FastLoader
 
 		}
 
-		private void history_IsSelectionEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+		private void items_IsSelectionEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
 		{
 			SetupEmailApplicationBar();
 		}
 
-		private void cache_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void items_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (cache.IsSelectionEnabled)
+			if (_currentList.IsSelectionEnabled)
 			{
-				bool hasSelection = ((cache.SelectedItems != null) && (cache.SelectedItems.Count > 0));
-				delete.IsEnabled = hasSelection;				
+				bool hasSelection = ((_currentList.SelectedItems != null) && (_currentList.SelectedItems.Count > 0));
+				delete.IsEnabled = hasSelection;
 			}
 		}
 	}

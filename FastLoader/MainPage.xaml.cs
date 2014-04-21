@@ -50,25 +50,16 @@ namespace FastLoader
 			PhoneApplicationService.Current.Deactivated += Current_Deactivated;
 			AppSettings.Instance.SaveAutoCompletionsListValueCahnged += Instance_SaveAutoCompletionsListValueCahnged;
 			_currentPage = WebItem.StartPage;
-			SettingsPage.ClearCachePressed += SettingsPage_ClearCachePressed;
+			History.CacheCleared += SettingsPage_ClearCachePressed;
 			browser.Navigate(_currentPage);
 		}
 
 		void SettingsPage_ClearCachePressed()
-		{
-			FSDBManager.Instance.Dispose();
-			FSDBManager.Instance = null;
-			long size = IsolatedStorageFile.GetUserStoreForApplication().GetCurretnSize();
-			if (MessageBox.Show(AppResources.ClearCacheMessage + " ( " + Utils.ConvertCountBytesToString(size) + " )", "", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-			{
-				using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
-				{
-					isf.Remove();
-					_history.Clear();
-					_currentPage = WebItem.StartPage;
-					browser.Navigate(_currentPage);
-				}
-			}
+		{			
+			_history.Clear();
+			_currentPage = WebItem.StartPage;
+			_request = null;
+			browser.Navigate(_currentPage);
 		}
 
 		void Current_Deactivated(object sender, DeactivatedEventArgs e)
@@ -476,11 +467,7 @@ namespace FastLoader
 				task.Show();
 			};
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
-
-			appBarMenuItem = new ApplicationBarMenuItem(AppResources.NoticeAboutBadPage);
-			appBarMenuItem.Click += NoticeAboutBadPage;
-			ApplicationBar.MenuItems.Add(appBarMenuItem);
-
+			
 			appBarMenuItem = new ApplicationBarMenuItem(AppResources.History);
 			appBarMenuItem.Click += OpenHistoryMenuItem_Click;
 			ApplicationBar.MenuItems.Add(appBarMenuItem);

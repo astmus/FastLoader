@@ -40,5 +40,10 @@ namespace FastLoader.DB
 				_fav = value;
 			}
 		}
+
+		public override string ToString()
+		{
+			return this.GetHashCode().ToString();
+		}
 	}
 }

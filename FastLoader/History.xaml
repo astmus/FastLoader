@@ -105,8 +105,8 @@
                                                 JumpListStyle="{StaticResource BuddiesJumpListStyle}"
                                                 GroupHeaderTemplate="{StaticResource BuddiesGroupHeaderTemplate}"
                                                 ItemTemplate="{StaticResource BuddiesItemTemplate}"                                       
-                                       IsSelectionEnabledChanged="history_IsSelectionEnabledChanged"
-                                       SelectionChanged="cache_SelectionChanged"
+                                       IsSelectionEnabledChanged="items_IsSelectionEnabledChanged"
+                                       SelectionChanged="items_SelectionChanged"
             />
                 </phone:PivotItem>
             <phone:PivotItem Header="{Binding Path=LocalizedResources.HistoryTitle, Source={StaticResource LocalizedStrings}}"  x:Name="HistoryItem">
@@ -118,8 +118,8 @@
                                                 JumpListStyle="{StaticResource BuddiesJumpListStyle}"
                                                 GroupHeaderTemplate="{StaticResource BuddiesGroupHeaderTemplate}"
                                                 ItemTemplate="{StaticResource HistoryItemTemplate}"
-                                               IsSelectionEnabledChanged="history_IsSelectionEnabledChanged"
-                                               SelectionChanged="SelectionChanged"
+                                               IsSelectionEnabledChanged="items_IsSelectionEnabledChanged"
+                                               SelectionChanged="items_SelectionChanged"
                                                />
             </phone:PivotItem>
             </phone:Pivot>

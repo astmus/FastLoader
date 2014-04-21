@@ -70,8 +70,7 @@
           <target state="translated">История и Кэш</target></trans-unit>
         <trans-unit id="Resx/Time" translate="yes" xml:space="preserve">
           <source>Time:</source>
-          <target state="needs-review-translation">Время:</target>
-          <note from="MultilingualUpdate" annotates="source" priority="2">Please verify the translation’s accuracy as the source string was updated after it was translated.</note>
+          <target state="signed-off">Время:</target>
           </trans-unit>
         <trans-unit id="Resx/HistoryTitle" translate="yes" xml:space="preserve">
           <source>History</source>
@@ -80,6 +79,10 @@
         <trans-unit id="Resx/WillBeSoon" translate="yes" xml:space="preserve">
           <source>will be soon</source>
           <target state="needs-review-translation" state-qualifier="mt-suggestion">скоро будет</target>
+        </trans-unit>
+        <trans-unit id="Resx/ClearHistory" translate="yes" xml:space="preserve">
+          <source>Clear all history</source>
+          <target state="translated">Очистить историю?</target>
         </trans-unit>
         <trans-unit id="Resx/CacheTitle" translate="yes" xml:space="preserve">
           <source>Cache</source>

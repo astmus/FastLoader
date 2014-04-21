@@ -15,7 +15,7 @@ namespace FastLoader.Classes
 
 		static WebItem()
 		{
-			_invalidChars = Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).Concat(new []{'#'}).ToArray();
+			_invalidChars = Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).Concat(new[] { '#' }).ToArray();
 		}
 
 		public WebItem(string uriString, long size)
@@ -23,7 +23,7 @@ namespace FastLoader.Classes
 		{
 			Size = size;
 		}
-				
+
 		public WebItem(Uri uri)
 			: base(uri.OriginalString, UriKind.Absolute)
 		{
@@ -39,43 +39,47 @@ namespace FastLoader.Classes
 		string _localHystoryFileName;
 		public string LocalHystoryFileName
 		{
-			get{
+			get
+			{
 				if (_localHystoryFileName == null)
-				{
-					StringBuilder b = new StringBuilder(this.OriginalString);
-
-					foreach (char c in _invalidChars)
-						b.Replace(c, ' ');
-                    
-					b.Insert(0, "storagefile");
-					b.Replace(" ", "");
-					b.Replace(".", "");
-					if (b.Length > 150)
-						b.Remove(150, b.Length - 150);
-					b.Append(".html");
-					_localHystoryFileName = b.ToString();
-				}
+					_localHystoryFileName = LocalHystoryFileNameFromUrlString(this.OriginalString);
 				return _localHystoryFileName;
 			}
-			
+
 		}
 
-        WebItem _localHistoryItem;
+		WebItem _localHistoryItem;
 		public WebItem LocalHystoryUri
 		{
 			get
 			{
 				if (!this.IsAbsoluteUri) return this;
-                if (_localHistoryItem == null)
-                {
-                    string res = LocalHystoryFileName;
-                    return new WebItem(res, this.Size);
-                }
-                return _localHistoryItem;
+				if (_localHistoryItem == null)
+				{
+					string res = LocalHystoryFileName;
+					return new WebItem(res, this.Size);
+				}
+				return _localHistoryItem;
 			}
 		}
 
-#region Static
+		#region Static
+
+		public static string LocalHystoryFileNameFromUrlString(string uri)
+		{
+			StringBuilder b = new StringBuilder(uri);
+
+			foreach (char c in _invalidChars)
+				b.Replace(c, ' ');
+
+			b.Insert(0, "storagefile");
+			b.Replace(" ", "");
+			b.Replace(".", "");
+			if (b.Length > 150)
+				b.Remove(150, b.Length - 150);
+			b.Append(".html");
+			return b.ToString();
+		}
 
 		static WebItem _startPage;
 		public static WebItem StartPage
@@ -91,10 +95,10 @@ namespace FastLoader.Classes
 		{
 			get
 			{
-				return _googlePage ?? (_googlePage = new WebItem("https://www.google.com",0));
+				return _googlePage ?? (_googlePage = new WebItem("https://www.google.com", 0));
 			}
 		}
 
-#endregion
+		#endregion
 	}
 }

@@ -29,8 +29,7 @@
                 <StackPanel>
                     <CheckBox IsChecked="{Binding SaveAutocompletionsList, Mode=TwoWay}"  Content="{Binding Path=LocalizedResources.SettingsSaveCompletions, Source={StaticResource LocalizedStrings}}">
                         
-                    </CheckBox>
-                    <Button Content="{Binding Path=LocalizedResources.ClearCacheMenuItem, Source={StaticResource LocalizedStrings}}" Click="Button_Click_1" />
+                    </CheckBox>                    
                     <TextBlock Margin="12,13,0,0" Text="{Binding Path=LocalizedResources.About, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>
                         
                     <StackPanel Margin="20,0,0,28">                       
