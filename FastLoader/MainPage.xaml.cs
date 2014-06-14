@@ -374,13 +374,21 @@ namespace FastLoader
 				
 				if (e.Uri.OriginalString.Contains("http"))
 				{
-					string clearUri = e.Uri.OriginalString.Remove(0, e.Uri.OriginalString.IndexOf("http"));
-					uriForNavigate = new WebItem(HttpUtility.UrlDecode(clearUri), 0);
-					if (uriForNavigate.OriginalString.Contains("ei") &&
-						uriForNavigate.OriginalString.Contains("sa") &&
-						uriForNavigate.OriginalString.Contains("ved") &&
-						uriForNavigate.OriginalString.Contains("usg"))
-						uriForNavigate = uriForNavigate.RemoveQueryParams("ei", "sa", "ved", "usg");
+					uriForNavigate = GetUriForNavigate(e.Uri.OriginalString);
+					if (uriForNavigate == null) return;					
+
+					List<string> forRemoveParams = new List<string>();
+					if (uriForNavigate.OriginalString.Contains("ei")) 
+						forRemoveParams.Add("ei");
+					if (uriForNavigate.OriginalString.Contains("sa"))
+						forRemoveParams.Add("sa");
+					if (uriForNavigate.OriginalString.Contains("ved"))
+						forRemoveParams.Add("ved");
+					if (uriForNavigate.OriginalString.Contains("usg"))
+						forRemoveParams.Add("usg");
+
+					if (forRemoveParams.Count > 0)
+						uriForNavigate = uriForNavigate.RemoveQueryParams(forRemoveParams.ToArray());
 					SetCurrentDomainFromUrl(uriForNavigate);
 				}
 				else
@@ -415,6 +423,20 @@ namespace FastLoader
 					else
 						_currentDomain = "";
 				}
+			}
+		}
+
+		WebItem GetUriForNavigate(string originalString)
+		{
+			string clearUri = originalString.Remove(0, originalString.IndexOf("http"));
+			try
+			{
+				return new WebItem(HttpUtility.UrlDecode(clearUri), 0);
+			}
+			catch
+			{
+				MessageBox.Show(AppResources.ExceptionMessage);
+				return null;
 			}
 		}
 

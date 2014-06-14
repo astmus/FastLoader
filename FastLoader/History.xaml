@@ -90,10 +90,12 @@
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <ProgressBar Name="progressBar" />
         <!--<TextBlock Margin="12,10,0,10" Grid.Row="0" Text="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>-->
-        <phone:Pivot Title="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}"
+        <phone:Pivot Grid.Row="1"  Title="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}"
                      x:Name="MainPivot" SelectionChanged="SelectionChanged"
                     >
             <phone:PivotItem Header="{Binding Path=LocalizedResources.CacheTitle, Source={StaticResource LocalizedStrings}}"  x:Name="CacheItem">

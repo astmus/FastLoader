@@ -19,6 +19,7 @@ using FastLoader.Resources;
 using FastLoader.Extensions;
 using Windows.Phone.System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace FastLoader
 {
@@ -44,15 +45,24 @@ namespace FastLoader
 			{
 				case 0:
 					if (cache.ItemsSource == null)
-						cache.ItemsSource = FSDBManager.Instance.GetSortedItems<CachedItem>();
+						InitItems<CachedItem>(cache);
 					_currentList = cache;
 					break;
 				case 1:
 					if (history.ItemsSource == null)
-						history.ItemsSource = FSDBManager.Instance.GetSortedItems<HistoryItem>();
+						InitItems<HistoryItem>(history);
 					_currentList = history;
 					break;
 			}				
+		}
+
+		async void InitItems<T>(LongListMultiSelector list) where T : class, IWebItem
+		{						
+			progressBar.IsIndeterminate = true;
+			progressBar.Visibility = Visibility.Visible;	
+			list.ItemsSource = await FSDBManager.Instance.GetSortedItems<T>();
+			progressBar.IsIndeterminate = false;
+			progressBar.Visibility = Visibility.Collapsed;
 		}
 
 		void AppBar()
