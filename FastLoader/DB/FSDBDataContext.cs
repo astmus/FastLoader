@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FastLoader.Interfaces;
 using System.Collections.ObjectModel;
+using Microsoft.Phone.Data.Linq;
 
 namespace FastLoader.DB
 {
@@ -15,17 +16,41 @@ namespace FastLoader.DB
 		static FSDBManager _dbManager;
 		public static FSDBManager Instance
 		{
-			get { return _dbManager ?? (_dbManager = new FSDBManager()); }
+			get 
+			{ 
+				return _dbManager ?? (_dbManager = new FSDBManager()); 
+			}
 			set { _dbManager = value; }
 		}
 
 		public FSDBManager(string connection = "Data source=isostore:/hystory.sdf") :
             base(connection)
-        {
-            if (this.DatabaseExists() == false)
-                this.CreateDatabase();
+        {            
+			if (this.DatabaseExists() == false)
+            { 
+				this.CreateDatabase();
+				DatabaseSchemaUpdater schemaUpdater = this.CreateDatabaseSchemaUpdater();
+				schemaUpdater.DatabaseSchemaVersion = this.SchemaVersion;
+                schemaUpdater.Execute();
+            }
+            else
+            {
+                DatabaseSchemaUpdater dbUpdater = this.CreateDatabaseSchemaUpdater();
+                if (dbUpdater.DatabaseSchemaVersion < this.SchemaVersion)
+                {					
+                    this.DeleteDatabase();
+                    this.CreateDatabase();
+                    /*dbUpdater.AddTable<CachedItem>();*/
+					dbUpdater.DatabaseSchemaVersion = this.SchemaVersion;
+                    dbUpdater.Execute();
+                }
+            }
         }
 
+        public int SchemaVersion
+        {
+            get { return 5; }
+        }
 
 		public ObservableCollection<ItemsGroup<T>> GetSortedItems<T>() where T : class, IWebItem
 		{
@@ -47,7 +72,7 @@ namespace FastLoader.DB
 			{
 				return this.GetTable<CachedItem>();
 			}
-		}
+		}        
 
 		public System.Data.Linq.Table<HistoryItem> History
 		{

@@ -81,8 +81,8 @@
           <target state="needs-review-translation" state-qualifier="mt-suggestion">скоро будет</target>
         </trans-unit>
         <trans-unit id="Resx/ClearHistory" translate="yes" xml:space="preserve">
-          <source>Clear all history</source>
-          <target state="translated">Очистить историю?</target>
+          <source>Clear all history?</source>
+          <target state="needs-review-translation">Очистить историю?</target><note from="MultilingualUpdate" priority="2" annotates="source">Please verify the translation’s accuracy as the source string was updated after it was translated.</note>
         </trans-unit>
         <trans-unit id="Resx/CacheTitle" translate="yes" xml:space="preserve">
           <source>Cache</source>

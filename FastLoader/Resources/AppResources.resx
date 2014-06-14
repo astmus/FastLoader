@@ -186,6 +186,6 @@
     <value>will be soon</value>
   </data>
   <data name="ClearHistory" xml:space="preserve">
-    <value>Clear all history</value>
+    <value>Clear all history?</value>
   </data>
 </root>

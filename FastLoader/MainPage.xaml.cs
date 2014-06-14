@@ -56,8 +56,9 @@ namespace FastLoader
 
 		void SettingsPage_ClearCachePressed()
 		{			
-			_history.Clear();
+			_history.Clear();			
 			_currentPage = WebItem.StartPage;
+			_completions.Clear();
 			_request = null;
 			browser.Navigate(_currentPage);
 		}
@@ -426,7 +427,7 @@ namespace FastLoader
 			{
 				OpenTime = DateTime.Now,
 				Link = current.OriginalString,
-				Title = tmp.Title
+				Title = (tmp != null) ? tmp.Title : ""
 			};
 
 			FSDBManager.Instance.History.InsertOnSubmit(hitem);

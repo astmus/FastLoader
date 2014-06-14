@@ -115,7 +115,7 @@ namespace FastLoader.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Clear all history.
+        ///   Looks up a localized string similar to Clear all history?.
         /// </summary>
         public static string ClearHistory {
             get {
