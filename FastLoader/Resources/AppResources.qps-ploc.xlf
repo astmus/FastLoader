@@ -85,6 +85,10 @@
           <source>Clear all history?</source>
           <target state="new">Clear all history?</target>
         </trans-unit>
+        <trans-unit id="Resx/Search" translate="yes" xml:space="preserve">
+          <source>Search</source>
+          <target state="new">Search</target>
+        </trans-unit>
         <trans-unit id="Resx/CacheTitle" translate="yes" xml:space="preserve">
           <source>Cache</source>
           <target state="new">Cache</target>

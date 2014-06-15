@@ -20,6 +20,9 @@ using FastLoader.Extensions;
 using Windows.Phone.System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Windows.Threading;
+using Microsoft.Phone.Reactive;
 
 namespace FastLoader
 {
@@ -52,6 +55,9 @@ namespace FastLoader
 					if (history.ItemsSource == null)
 						InitItems<HistoryItem>(history);
 					_currentList = history;
+					break;
+				case 2:
+					_currentList = search;
 					break;
 			}				
 		}
@@ -89,13 +95,20 @@ namespace FastLoader
 			if (_currentList == cache)
 				ClearCache();
 			else
-				ClearHistory();
+				if (_currentList == history)
+					ClearHistory();
+				else
+					DeleteSearchedItems();
+		}
+
+		void DeleteSearchedItems()
+		{
+
 		}
 
 		void ClearCache()
 		{
-			FSDBManager.Instance.Dispose();
-			FSDBManager.Instance = null;
+			FSDBManager.Instance.Dispose();			
 			long size = (FSDBManager.Instance.Cache.Count() > 0) ? FSDBManager.Instance.Cache.Sum(item => item.Size) : 0;
 			if (MessageBox.Show(AppResources.ClearCacheMessage + " ( " + Utils.ConvertCountBytesToString(size) + " )", "", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
 			{
@@ -116,6 +129,7 @@ namespace FastLoader
 
 		void ClearHistory()
 		{
+			
 			if (MessageBox.Show(AppResources.ClearHistory, "", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
 			{
 				FSDBManager.Instance.History.DeleteAllOnSubmit(FSDBManager.Instance.History);
@@ -126,7 +140,7 @@ namespace FastLoader
 			}
 		}
 
-		private void SetupEmailApplicationBar()
+		private void SetupDeletengApplicationBar()
 		{
 			ClearApplicationBar();
 
@@ -211,7 +225,7 @@ namespace FastLoader
 
 		private void items_IsSelectionEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
 		{
-			SetupEmailApplicationBar();
+			SetupDeletengApplicationBar();
 		}
 
 		private void items_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -222,5 +236,54 @@ namespace FastLoader
 				delete.IsEnabled = hasSelection;
 			}
 		}
+
+		private void cache_ItemRealized(object sender, ItemRealizationEventArgs e)
+		{
+			int i = 0;
+			var s = e.ItemKind;
+		}
+
+
+		Timer t;
+		private void searchBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+		{
+			TimerCallback tc = set3;
+			if (t != null)
+				t.Dispose();
+			t = new Timer(tc, (sender as TextBox).Text, 1200, Timeout.Infinite);
+		}
+
+		async void set3(object state)
+		{
+			StartDisplayLoading();
+			
+			var resultItems = await FSDBManager.Instance.GetSortedItemsWhichContain<CachedItem>(state as String);
+			Dispatcher.BeginInvoke(() =>
+			{
+				search.ItemsSource = resultItems;
+			});
+			
+			EndDisplayLoading();
+		}
+
+		void StartDisplayLoading()
+		{
+			Dispatcher.BeginInvoke(() =>
+			{
+				progressBar.IsIndeterminate = true;
+				progressBar.Visibility = Visibility.Visible;
+			});
+		}
+
+		void EndDisplayLoading()
+		{
+			Dispatcher.BeginInvoke(() =>
+			{
+				progressBar.IsIndeterminate = false;
+				progressBar.Visibility = Visibility.Collapsed;
+			});
+		}
+
+
 	}
 }

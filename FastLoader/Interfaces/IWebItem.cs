@@ -10,5 +10,6 @@ namespace FastLoader.Interfaces
 	{
 		DateTime OpenTime { get; set; }
 		String Link { get; set; }
+		String Title { get; set; }
 	}
 }

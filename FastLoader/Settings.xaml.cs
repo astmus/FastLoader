@@ -17,7 +17,7 @@ namespace FastLoader
 		{
 			this.DataContext = AppSettings.Instance;
 			InitializeComponent();
-			appName.Text += " (v 1.1.6.21)";
+			appName.Text += " (v 1.1.6.21)";			
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e)

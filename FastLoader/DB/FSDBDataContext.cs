@@ -8,19 +8,27 @@ using System.Threading.Tasks;
 using FastLoader.Interfaces;
 using System.Collections.ObjectModel;
 using Microsoft.Phone.Data.Linq;
+using System.Diagnostics;
+using System.Threading;
 
 namespace FastLoader.DB
 {
 	public class FSDBManager : DataContext
 	{
 		static FSDBManager _dbManager;
+		Mutex _mutex = new Mutex();
 		public static FSDBManager Instance
 		{
 			get 
 			{ 
 				return _dbManager ?? (_dbManager = new FSDBManager()); 
 			}
-			set { _dbManager = value; }
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+			_dbManager = null;
 		}
 
 		public FSDBManager(string connection = "Data source=isostore:/hystory.sdf") :
@@ -52,22 +60,44 @@ namespace FastLoader.DB
             get { return 5; }
         }
 
+		
 		public Task<ObservableCollection<ItemsGroup<T>>> GetSortedItems<T>() where T : class, IWebItem
 		{
 			return Task.Factory.StartNew<ObservableCollection<ItemsGroup<T>>>(() =>
-			{				
-				ObservableCollection<ItemsGroup<T>> res = new ObservableCollection<ItemsGroup<T>>();
-				Dictionary<DateTime, List<T>> dates = (from item in FSDBManager.Instance.GetTable<T>()
-													   group item by item.OpenTime.Date).ToDictionary(g => g.Key,
-																 g => g.OrderByDescending(x => x.OpenTime).ToList());
-				foreach (DateTime dt in dates.Keys)
-				{
-					ItemsGroup<T> g = new ItemsGroup<T>(dt.ToString("dd MMMM yyyy"), dates[dt]);
-					res.Insert(0, g);
-				}
-				return res;
+			{
+				_mutex.WaitOne();
+				//Dictionary<String, List<T>>
+				List<ItemsGroup<T>> dates = FSDBManager.Instance.GetTable<T>().OrderByDescending(x => x.OpenTime).GroupBy(x=>x.OpenTime.Date).ToList().
+					Select(s => new ItemsGroup<T>(s.Key.ToString("dd MMMM yyyy"),s.ToList())).ToList();
+				//select new ItemsGroup<T>(gr.Key.ToString("dd MMMM yyyy"), gr.ToList())).ToList();
+				_mutex.ReleaseMutex();
+				return new ObservableCollection<ItemsGroup<T>>(dates);
 			});
-		}		
+		}
+
+		public Task<ObservableCollection<ItemsGroup<T>>> GetSortedItemsWhichContain<T>(string contain) where T : class, IWebItem
+		{
+			return Task.Factory.StartNew<ObservableCollection<ItemsGroup<T>>>(() =>
+			{
+				_mutex.WaitOne();
+				//Dictionary<String, List<T>>
+				List<ItemsGroup<T>> dates = FSDBManager.Instance.GetTable<T>().Where(item=>item.Title.ToLower().Contains(contain))
+					.OrderByDescending(x => x.OpenTime).GroupBy(x => x.OpenTime.Date).ToList().
+					Select(s => new ItemsGroup<T>(s.Key.ToString("dd MMMM yyyy"), s.ToList())).ToList();
+				//select new ItemsGroup<T>(gr.Key.ToString("dd MMMM yyyy"), gr.ToList())).ToList();
+				_mutex.ReleaseMutex();
+				return new ObservableCollection<ItemsGroup<T>>(dates);
+			});			
+		}
+
+		Dictionary<Type, int> _loadedCount = new Dictionary<Type, int>();
+		int GetLoadedItemsCount(Type t)
+		{
+			if (_loadedCount.ContainsKey(t))
+				return _loadedCount[t];
+			else
+				return 0;
+		}
 		
 		public System.Data.Linq.Table<CachedItem> Cache
 		{

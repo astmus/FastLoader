@@ -16,7 +16,7 @@
     shell:SystemTray.IsVisible="True">
 
     <phone:PhoneApplicationPage.Resources>
-        <Style TargetType="phone:LongListSelector" x:Key="BuddiesJumpListStyle">
+        <Style TargetType="phone:LongListSelector" x:Key="ItemsJumpListStyle">
             <Setter Property="LayoutMode" Value="List"/>
             <Setter Property="ItemTemplate">
                 <Setter.Value>
@@ -28,7 +28,6 @@
                                                        FontFamily="{StaticResource PhoneFontFamilySemiBold}"
                                                        FontSize="42"
                                                        Margin="8,0,0,0"
-                                                       
                                                        Foreground="White"                                        
                                                        VerticalAlignment="Bottom"/>
                         </Border>
@@ -36,13 +35,13 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <DataTemplate x:Key="BuddiesGroupHeaderTemplate">
+        <DataTemplate x:Key="ItemsGroupHeaderTemplate">
             <Border Background="Transparent" Margin="12,8,0,8">
                 <Border Background="{StaticResource PhoneAccentBrush}" 	
                                         Padding="8,0,0,0" Width="400" Height="62" 				 
                                         HorizontalAlignment="Left">
                     <TextBlock Text="{Binding Key}" 
-                                               Foreground="#FFFFFF" 
+                                               Foreground="White" 
                                                FontSize="48"
                                                FontFamily="{StaticResource PhoneFontFamilySemiLight}"
                                                HorizontalAlignment="Left"
@@ -62,18 +61,18 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Path=LocalizedResources.Time, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextSmallStyle}"/>
                         <TextBlock Text="{Binding OpenTime, StringFormat='{}{0:HH:mm}'}" Style="{StaticResource PhoneTextSmallStyle}" FontFamily="{StaticResource PhoneFontFamilySemiBold}"/>
-                    </StackPanel>                    
+                    </StackPanel>
                 </StackPanel>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="BuddiesItemTemplate">
+        <DataTemplate x:Key="CacheItemTemplate">
             <Grid toolkit:TiltEffect.IsTiltEnabled="True" Tap="Grid_Tap"  Margin="12,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Image CacheMode="BitmapCache"  Width="64" Height="64" Source="{Binding Favicon}" VerticalAlignment="Top" />
-                <StackPanel Grid.Column="1" VerticalAlignment="Top">                    
+                <StackPanel Grid.Column="1" VerticalAlignment="Top">
                     <TextBlock Text="{Binding Title}" Style="{StaticResource PhoneTextNormalStyle}" TextWrapping="Wrap" FontFamily="{StaticResource PhoneFontFamilySemiBold}"/>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Path=LocalizedResources.Time, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextSmallStyle}"/>
@@ -99,32 +98,54 @@
                      x:Name="MainPivot" SelectionChanged="SelectionChanged"
                     >
             <phone:PivotItem Header="{Binding Path=LocalizedResources.CacheTitle, Source={StaticResource LocalizedStrings}}"  x:Name="CacheItem">
-        <toolkit:LongListMultiSelector x:Name="cache" Background="Transparent"
+                <toolkit:LongListMultiSelector x:Name="cache" Background="Transparent"
                                                 Margin="0,-8,0,0"
                                                 LayoutMode="List"
                                                 IsGroupingEnabled="True"
                                                 HideEmptyGroups="True"
-                                                JumpListStyle="{StaticResource BuddiesJumpListStyle}"
-                                                GroupHeaderTemplate="{StaticResource BuddiesGroupHeaderTemplate}"
-                                                ItemTemplate="{StaticResource BuddiesItemTemplate}"                                       
+                                                JumpListStyle="{StaticResource ItemsJumpListStyle}"
+                                                GroupHeaderTemplate="{StaticResource ItemsGroupHeaderTemplate}"
+                                                ItemTemplate="{StaticResource CacheItemTemplate}"                                       
                                        IsSelectionEnabledChanged="items_IsSelectionEnabledChanged"
-                                       SelectionChanged="items_SelectionChanged"
+                                       SelectionChanged="items_SelectionChanged" ItemRealized="cache_ItemRealized"
             />
-                </phone:PivotItem>
+            </phone:PivotItem>
             <phone:PivotItem Header="{Binding Path=LocalizedResources.HistoryTitle, Source={StaticResource LocalizedStrings}}"  x:Name="HistoryItem">
                 <toolkit:LongListMultiSelector x:Name="history" Background="Transparent"
                                                 Margin="0,-8,0,0"                                                
                                                 LayoutMode="List"
                                                 IsGroupingEnabled="True"
                                                 HideEmptyGroups="True"
-                                                JumpListStyle="{StaticResource BuddiesJumpListStyle}"
-                                                GroupHeaderTemplate="{StaticResource BuddiesGroupHeaderTemplate}"
+                                                JumpListStyle="{StaticResource ItemsJumpListStyle}"
+                                                GroupHeaderTemplate="{StaticResource ItemsGroupHeaderTemplate}"
                                                 ItemTemplate="{StaticResource HistoryItemTemplate}"
                                                IsSelectionEnabledChanged="items_IsSelectionEnabledChanged"
                                                SelectionChanged="items_SelectionChanged"
                                                />
             </phone:PivotItem>
-            </phone:Pivot>
+
+            <phone:PivotItem Header="{Binding Path=LocalizedResources.Search, Source={StaticResource LocalizedStrings}}"  x:Name="SearchItem">                
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                <TextBox Name="searchBox" Grid.Row="0"  KeyUp="searchBox_KeyUp"/>
+                <toolkit:LongListMultiSelector Grid.Row="1"  x:Name="search" Background="Transparent"
+                                                Margin="0,-8,0,0"                                                
+                                                LayoutMode="List"
+                                                IsGroupingEnabled="True"
+                                                HideEmptyGroups="True"
+                                                JumpListStyle="{StaticResource ItemsJumpListStyle}"
+                                                GroupHeaderTemplate="{StaticResource ItemsGroupHeaderTemplate}"
+                                                ItemTemplate="{StaticResource CacheItemTemplate}"                                               
+                                               IsSelectionEnabledChanged="items_IsSelectionEnabledChanged"
+                                               SelectionChanged="items_SelectionChanged"
+                                               />
+                </Grid>
+            </phone:PivotItem>
+
+        </phone:Pivot>
         <!---->
 
         <!--TitlePanel contains the name of the application and page title-->
@@ -133,10 +154,11 @@
         </StackPanel>-->
 
         <!--ContentPanel - place additional content here-->
-            <!--<phone:PivotItem x:Name="MultiselectLbxItem">
+        <!--<phone:PivotItem x:Name="MultiselectLbxItem">
                 
                 </phone:PivotItem>
             </phone:Pivot>-->
+
     </Grid>
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar>

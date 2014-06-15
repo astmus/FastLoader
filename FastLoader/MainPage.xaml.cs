@@ -262,28 +262,9 @@ namespace FastLoader
 				content = Regex.Replace(content, "<form action=\"/search.*form>", "");
 
 			RemoveImgTagsFromPage(ref content);
-			WebItem item = _request.HttpRequest.RequestUri as WebItem;			
-			
-			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(item.LocalHystoryFileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
-			{
-				StreamWriter sw = new StreamWriter(savefilestr);
-				sw.Write(content);
-				item.Size = savefilestr.Length;
-				savefilestr.Close();
-			}
+			WebItem item = _request.HttpRequest.RequestUri as WebItem;
 
-			//add item to persist history
-			CachedItem cachedItem = new CachedItem()
-			{
-				Link = item.OriginalString,
-				Size = item.Size,
-				OpenTime = DateTime.Now,
-				Title = Utils.GetTitleFromHtmlPage(content),
-				FormatedSize = Utils.ConvertCountBytesToString(item.Size)
-			};
-			
-			FSDBManager.Instance.Cache.InsertOnSubmit(cachedItem);
-			FSDBManager.Instance.SubmitChanges();			
+			AddCacheItemToStorage(content);
 
 			sourceStream.Dispose();
 
@@ -453,6 +434,46 @@ namespace FastLoader
 			};
 
 			FSDBManager.Instance.History.InsertOnSubmit(hitem);
+			FSDBManager.Instance.SubmitChanges();
+
+		}
+
+		void AddCacheItemToStorage(string content)
+		{
+			WebItem item = _request.HttpRequest.RequestUri as WebItem;
+
+			using (IsolatedStorageFileStream savefilestr = new IsolatedStorageFileStream(item.LocalHystoryFileName, FileMode.Create, FileAccess.Write, IsolatedStorageFile.GetUserStoreForApplication()))
+			{
+				StreamWriter sw = new StreamWriter(savefilestr);
+				sw.Write(content);
+				item.Size = savefilestr.Length;
+				savefilestr.Close();
+			}
+
+			//add item to persist history
+			CachedItem cachedItem = new CachedItem()
+			{
+				Link = item.OriginalString,
+				Size = item.Size,
+				OpenTime = DateTime.Now,
+				Title = Utils.GetTitleFromHtmlPage(content),
+				FormatedSize = Utils.ConvertCountBytesToString(item.Size)
+			};
+
+			for (int i = 0; i < 2500; i++)
+			{
+				cachedItem = new CachedItem()
+				{
+					Link = item.OriginalString,
+					Size = item.Size,
+					OpenTime = DateTime.Now.AddHours(i),
+					Title = Utils.GetTitleFromHtmlPage(content),
+					FormatedSize = Utils.ConvertCountBytesToString(item.Size)
+				};
+
+				FSDBManager.Instance.Cache.InsertOnSubmit(cachedItem);
+				
+			}
 			FSDBManager.Instance.SubmitChanges();
 		}
 

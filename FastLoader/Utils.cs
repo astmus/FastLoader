@@ -13,7 +13,7 @@ namespace FastLoader
 	static class Utils
 	{
 		public static string GetTitleFromHtmlPage(string pageContent)
-		{
+		{			
 			return Regex.Match(pageContent, "<title>(.*?)</title>").Groups[1].Value;
 		}
 
