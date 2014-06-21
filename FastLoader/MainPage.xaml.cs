@@ -263,7 +263,7 @@ namespace FastLoader
 			}
 
 			if (_currentDomain.Contains("google"))
-				content = Regex.Replace(content, "<form action=\"/search.*form>", "");
+				content = Regex.Replace(content, "<input class=\"mlst\".*type=\"text\">", "");
 
 			RemoveImgTagsFromPage(ref content);
 			WebItem item = _request.HttpRequest.RequestUri as WebItem;
