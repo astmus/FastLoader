@@ -151,6 +151,15 @@ namespace FastLoader.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Landscape mode.
+        /// </summary>
+        public static string LandscapeMode {
+            get {
+                return ResourceManager.GetString("LandscapeMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to report about bad page.
         /// </summary>
         public static string NoticeAboutBadPage {
@@ -165,6 +174,15 @@ namespace FastLoader.Resources {
         public static string OpenInIE {
             get {
                 return ResourceManager.GetString("OpenInIE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Portrait mode.
+        /// </summary>
+        public static string PortraitMode {
+            get {
+                return ResourceManager.GetString("PortraitMode", resourceCulture);
             }
         }
         

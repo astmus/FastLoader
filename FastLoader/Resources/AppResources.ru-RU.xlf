@@ -90,7 +90,14 @@
         </trans-unit>
         <trans-unit id="Resx/RemoveAllItemsFromTheList" translate="yes" xml:space="preserve">
           <source>Remove all items from the results list?</source>
-          <target state="needs-review-translation">Удалить все найденные элементы из списка?</target><note from="MultilingualUpdate" priority="2" annotates="source">Please verify the translation’s accuracy as the source string was updated after it was translated.</note>
+          <target state="signed-off">Удалить все найденные элементы из списка?</target></trans-unit>
+        <trans-unit id="Resx/PortraitMode" translate="yes" xml:space="preserve">
+          <source>Portrait mode</source>
+          <target state="needs-review-translation" state-qualifier="tm-suggestion">Портретный режим</target>
+        </trans-unit>
+        <trans-unit id="Resx/LandscapeMode" translate="yes" xml:space="preserve">
+          <source>Landscape mode</source>
+          <target state="translated">Альбомный режим</target>
         </trans-unit>
         <trans-unit id="Resx/CacheTitle" translate="yes" xml:space="preserve">
           <source>Cache</source>

@@ -194,4 +194,10 @@
   <data name="RemoveAllItemsFromTheList" xml:space="preserve">
     <value>Remove all items from the results list?</value>
   </data>
+  <data name="LandscapeMode" xml:space="preserve">
+    <value>Landscape mode</value>
+  </data>
+  <data name="PortraitMode" xml:space="preserve">
+    <value>Portrait mode</value>
+  </data>
 </root>

@@ -93,6 +93,14 @@
           <source>Remove all items from the results list?</source>
           <target state="new">Remove all items from the results list?</target>
         </trans-unit>
+        <trans-unit id="Resx/PortraitMode" translate="yes" xml:space="preserve">
+          <source>Portrait mode</source>
+          <target state="new">Portrait mode</target>
+        </trans-unit>
+        <trans-unit id="Resx/LandscapeMode" translate="yes" xml:space="preserve">
+          <source>Landscape mode</source>
+          <target state="new">Landscape mode</target>
+        </trans-unit>
         <trans-unit id="Resx/CacheTitle" translate="yes" xml:space="preserve">
           <source>Cache</source>
           <target state="new">Cache</target>

@@ -25,6 +25,8 @@ using System.Collections.ObjectModel;
 using FastLoader.Classes;
 using FastLoader.Data;
 using FastLoader.DB;
+using System.Threading;
+using System.Windows.Media.Imaging;
 
 namespace FastLoader
 {
@@ -41,9 +43,11 @@ namespace FastLoader
 		Stack<WebItem> _history = new Stack<WebItem>();
 		ObservableCollection<string> _completions = new ObservableCollection<string>();
 		bool _nowIsPageRefreshing = false;
+		ApplicationBarMenuItem _changeViewItem;
 		public MainPage()
 		{
 			InitializeComponent();
+			
 			BuildLocalizedApplicationBar();
 			PhoneApplicationService.Current.Closing += MainPage_ApplicationClosing;
 			PhoneApplicationService.Current.Activated += Current_Activated;
@@ -460,7 +464,7 @@ namespace FastLoader
 				FormatedSize = Utils.ConvertCountBytesToString(item.Size)
 			};
 
-			/*for (int i = 0; i < 2500; i++)
+			for (int i = 0; i < 2500; i++)
 			{
 				cachedItem = new CachedItem()
 				{
@@ -473,7 +477,7 @@ namespace FastLoader
 
 				FSDBManager.Instance.Cache.InsertOnSubmit(cachedItem);
 				
-			}*/
+			}
 			FSDBManager.Instance.Cache.InsertOnSubmit(cachedItem);
 			FSDBManager.Instance.SubmitChanges();
 		}
@@ -513,13 +517,35 @@ namespace FastLoader
 			};
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
 			
-			appBarMenuItem = new ApplicationBarMenuItem(AppResources.History);
+			appBarMenuItem = new ApplicationBarMenuItem(AppResources.History);			
 			appBarMenuItem.Click += OpenHistoryMenuItem_Click;
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
 			 
 			appBarMenuItem = new ApplicationBarMenuItem(AppResources.Settings);
 			appBarMenuItem.Click += (object sender, EventArgs e) => { NavigationService.Navigate(new Uri("/Settings.xaml", UriKind.Relative)); };
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
+
+			_changeViewItem = new ApplicationBarMenuItem(AppResources.LandscapeMode);
+			_changeViewItem.Click += ChangeViewMode;
+			ApplicationBar.MenuItems.Add(_changeViewItem);
+		}
+
+		bool _isPortrait = true;
+		void ChangeViewMode(object sender, EventArgs e)
+		{
+			_isPortrait = !_isPortrait;
+			if (_isPortrait)
+			{
+				this.SupportedOrientations = SupportedPageOrientation.Portrait;
+				this.Orientation = PageOrientation.PortraitUp;
+				_changeViewItem.Text = AppResources.LandscapeMode;
+			}
+			else
+			{
+				this.SupportedOrientations = SupportedPageOrientation.Landscape;
+				this.Orientation = PageOrientation.Landscape;
+				_changeViewItem.Text = AppResources.PortraitMode;
+			}
 		}
 
 		void OpenHistoryMenuItem_Click(object sender, EventArgs e)
@@ -557,6 +583,6 @@ namespace FastLoader
 		private void TextBox_LostFocus(object sender, RoutedEventArgs e)
 		{
 			ApplicationBar.Opacity = 0;
-		}
+		}		
 	}
 }

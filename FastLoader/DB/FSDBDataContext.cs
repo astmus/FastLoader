@@ -68,7 +68,7 @@ namespace FastLoader.DB
 				_mutex.WaitOne();
 				//Dictionary<String, List<T>>
 				List<ItemsGroup<T>> dates = FSDBManager.Instance.GetTable<T>().OrderByDescending(x => x.OpenTime).GroupBy(x=>x.OpenTime.Date).ToList().
-					Select(s => new ItemsGroup<T>(s.Key.ToString("dd MMMM yyyy"),s.ToList())).ToList();
+					Select(s => new ItemsGroup<T>(s.Key.ToString("dd MMMM yyyy"),s.ToList())).OrderByDescending(ob=>ob.Key).ToList();
 				//select new ItemsGroup<T>(gr.Key.ToString("dd MMMM yyyy"), gr.ToList())).ToList();
 				_mutex.ReleaseMutex();
 				return new ObservableCollection<ItemsGroup<T>>(dates);
