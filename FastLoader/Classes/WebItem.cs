@@ -57,7 +57,7 @@ namespace FastLoader.Classes
 				if (_localHistoryItem == null)
 				{
 					string res = LocalHystoryFileName;
-					return new WebItem(res, this.Size);
+					_localHistoryItem = new WebItem(res, this.Size);
 				}
 				return _localHistoryItem;
 			}

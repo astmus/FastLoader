@@ -187,6 +187,15 @@ namespace FastLoader.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove all items from the results list?.
+        /// </summary>
+        public static string RemoveAllItemsFromTheList {
+            get {
+                return ResourceManager.GetString("RemoveAllItemsFromTheList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LeftToRight.
         /// </summary>
         public static string ResourceFlowDirection {

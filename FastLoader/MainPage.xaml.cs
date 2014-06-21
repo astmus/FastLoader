@@ -51,7 +51,7 @@ namespace FastLoader
 			AppSettings.Instance.SaveAutoCompletionsListValueCahnged += Instance_SaveAutoCompletionsListValueCahnged;
 			_currentPage = WebItem.StartPage;
 			History.CacheCleared += SettingsPage_ClearCachePressed;
-			browser.Navigate(_currentPage);
+			browser.Navigate(_currentPage);			
 		}
 
 		void SettingsPage_ClearCachePressed()
@@ -460,7 +460,7 @@ namespace FastLoader
 				FormatedSize = Utils.ConvertCountBytesToString(item.Size)
 			};
 
-			for (int i = 0; i < 2500; i++)
+			/*for (int i = 0; i < 2500; i++)
 			{
 				cachedItem = new CachedItem()
 				{
@@ -473,7 +473,8 @@ namespace FastLoader
 
 				FSDBManager.Instance.Cache.InsertOnSubmit(cachedItem);
 				
-			}
+			}*/
+			FSDBManager.Instance.Cache.InsertOnSubmit(cachedItem);
 			FSDBManager.Instance.SubmitChanges();
 		}
 
@@ -542,11 +543,10 @@ namespace FastLoader
 		{
 			string filename = (_currentPage as WebItem).LocalHystoryFileName;
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(filename))
-			{
 				IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(filename);
-				_nowIsPageRefreshing = true;
-				Navigate(_currentPage);
-			}
+
+			_nowIsPageRefreshing = true;
+			Navigate(_currentPage);
 		}
 
 		private void TextBox_GotFocus(object sender, RoutedEventArgs e)

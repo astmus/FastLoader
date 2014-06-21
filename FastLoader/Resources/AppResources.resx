@@ -191,4 +191,7 @@
   <data name="Search" xml:space="preserve">
     <value>Search</value>
   </data>
+  <data name="RemoveAllItemsFromTheList" xml:space="preserve">
+    <value>Remove all items from the results list?</value>
+  </data>
 </root>

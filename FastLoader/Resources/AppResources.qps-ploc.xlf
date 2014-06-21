@@ -89,6 +89,10 @@
           <source>Search</source>
           <target state="new">Search</target>
         </trans-unit>
+        <trans-unit id="Resx/RemoveAllItemsFromTheList" translate="yes" xml:space="preserve">
+          <source>Remove all items from the results list?</source>
+          <target state="new">Remove all items from the results list?</target>
+        </trans-unit>
         <trans-unit id="Resx/CacheTitle" translate="yes" xml:space="preserve">
           <source>Cache</source>
           <target state="new">Cache</target>

@@ -16,6 +16,25 @@
     shell:SystemTray.IsVisible="True">
 
     <phone:PhoneApplicationPage.Resources>
+        <Storyboard x:Name="searchHeightAnimationHide">
+            <DoubleAnimation Duration="0:0:0.25"
+                             To="0"
+                             Storyboard.TargetProperty="Height"
+                             Storyboard.TargetName="searchBox"
+                             />
+
+        </Storyboard>
+        <Storyboard x:Name="searchHeightAnimationShow">
+            <DoubleAnimation Duration="0:0:0.25"
+                             To="72"
+                             Storyboard.TargetProperty="Height"
+                             Storyboard.TargetName="searchBox"
+                             Completed="ShowSearchBoxAnimation_Completed"
+                             />
+
+        </Storyboard>
+
+
         <Style TargetType="phone:LongListSelector" x:Key="ItemsJumpListStyle">
             <Setter Property="LayoutMode" Value="List"/>
             <Setter Property="ItemTemplate">
@@ -90,11 +109,13 @@
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition x:Name="searchRow"  Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ProgressBar Name="progressBar" />
+        <TextBox x:Name="searchBox" Grid.Row="1" Height="0" LostFocus="searchBox_LostFocus"  KeyUp="searchBox_KeyUp"/>
         <!--<TextBlock Margin="12,10,0,10" Grid.Row="0" Text="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}" Style="{StaticResource PhoneTextNormalStyle}"/>-->
-        <phone:Pivot Grid.Row="1"  Title="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}"
+        <phone:Pivot Grid.Row="2"  Title="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}"
                      x:Name="MainPivot" SelectionChanged="SelectionChanged"
                     >
             <phone:PivotItem Header="{Binding Path=LocalizedResources.CacheTitle, Source={StaticResource LocalizedStrings}}"  x:Name="CacheItem">
@@ -122,27 +143,6 @@
                                                IsSelectionEnabledChanged="items_IsSelectionEnabledChanged"
                                                SelectionChanged="items_SelectionChanged"
                                                />
-            </phone:PivotItem>
-
-            <phone:PivotItem Header="{Binding Path=LocalizedResources.Search, Source={StaticResource LocalizedStrings}}"  x:Name="SearchItem">                
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                <TextBox Name="searchBox" Grid.Row="0"  KeyUp="searchBox_KeyUp"/>
-                <toolkit:LongListMultiSelector Grid.Row="1"  x:Name="search" Background="Transparent"
-                                                Margin="0,-8,0,0"                                                
-                                                LayoutMode="List"
-                                                IsGroupingEnabled="True"
-                                                HideEmptyGroups="True"
-                                                JumpListStyle="{StaticResource ItemsJumpListStyle}"
-                                                GroupHeaderTemplate="{StaticResource ItemsGroupHeaderTemplate}"
-                                                ItemTemplate="{StaticResource CacheItemTemplate}"                                               
-                                               IsSelectionEnabledChanged="items_IsSelectionEnabledChanged"
-                                               SelectionChanged="items_SelectionChanged"
-                                               />
-                </Grid>
             </phone:PivotItem>
 
         </phone:Pivot>
