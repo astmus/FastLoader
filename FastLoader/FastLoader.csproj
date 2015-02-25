@@ -24,6 +24,7 @@
     <ValidateXaml>true</ValidateXaml>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <NuGetPackageImportStamp>5305658e</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -225,11 +226,12 @@
     <Reference Include="MSPToolkit">
       <HintPath>packages\MSPToolkit.2.6.7\lib\sl4-wp71\MSPToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="System.IO.Compression">
-      <HintPath>packages\Microsoft.Bcl.Compression.3.9.73\lib\wp8\System.IO.Compression.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Phone.Controls.Toolkit">
       <HintPath>packages\Microsoft.Phone.Controls.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Compression, Version=3.9.85.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.Bcl.Compression.3.9.85\lib\wp8\System.IO.Compression.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -259,15 +261,14 @@
   </Target>
   -->
   <ProjectExtensions />
-  <Import Project="packages\Microsoft.Bcl.Compression.3.9.73\tools\Microsoft.Bcl.Compression.targets" Condition="Exists('packages\Microsoft.Bcl.Compression.3.9.73\tools\Microsoft.Bcl.Compression.targets')" />
-  <Target Name="EnsureBclCompressionImported" BeforeTargets="BeforeBuild" Condition="'$(BclCompressionImported)' == ''">
-    <Error Condition="!Exists('packages\Microsoft.Bcl.Compression.3.9.73\tools\Microsoft.Bcl.Compression.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
-    <Error Condition="Exists('packages\Microsoft.Bcl.Compression.3.9.73\tools\Microsoft.Bcl.Compression.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2002" />
-  </Target>
-  <Import Project="packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Multilingual App Toolkit\Microsoft.Multilingual.ResxResources.targets" Label="MultilingualAppToolkit" />
-  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
-    <Error Condition="!Exists('packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
-    <Error Condition="Exists('packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  <Import Project="packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+    <Error Condition="!Exists('packages\Microsoft.Bcl.Compression.3.9.85\build\wp8\Microsoft.Bcl.Compression.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Bcl.Compression.3.9.85\build\wp8\Microsoft.Bcl.Compression.targets'))" />
   </Target>
+  <Import Project="packages\Microsoft.Bcl.Compression.3.9.85\build\wp8\Microsoft.Bcl.Compression.targets" Condition="Exists('packages\Microsoft.Bcl.Compression.3.9.85\build\wp8\Microsoft.Bcl.Compression.targets')" />
 </Project>
