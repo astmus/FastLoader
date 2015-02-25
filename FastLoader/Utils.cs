@@ -37,28 +37,33 @@ namespace FastLoader
 			return (res / 1024).ToString(format) + " GByte";
 		}
 
-		public static MemoryStream CopyAndClose(Stream inputStream, int expectedLength)
+		public static MemoryStream CopyAndClose(Stream inputStream, int expectedLength, Action<uint> progressChanged, Action loadCompleted)
 		{
-			const int readSize = 256;
+			const int readSize = 2048;
 			byte[] buffer = new byte[readSize];
 			MemoryStream ms = new MemoryStream();
-						
-			int count;
-#if DEBUG
-			Stopwatch sw = new Stopwatch();
-			sw.Start();
+            
+            int count;
 
-			while ((count = inputStream.Read(buffer, 0, readSize)) > 0)
-			{
-				ms.Write(buffer, 0, count);
-				Debug.WriteLine(ms.Length * 100 / expectedLength);
-			}
+            if (expectedLength > 0)
+            {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
 
-			Debug.WriteLine(sw.ElapsedMilliseconds);
-#else
-			while ((count = inputStream.Read(buffer, 0, readSize)) > 0)
-				ms.Write(buffer, 0, count);
-#endif
+                while ((count = inputStream.Read(buffer, 0, readSize)) > 0)
+                {
+                    ms.Write(buffer, 0, count);
+                    uint percents = (uint)(ms.Length * 100 / expectedLength);
+                    progressChanged(percents);
+                    Debug.WriteLine(percents);
+                }
+
+                loadCompleted();
+                Debug.WriteLine(sw.ElapsedMilliseconds);
+            }
+            else
+			    while ((count = inputStream.Read(buffer, 0, readSize)) > 0)
+				    ms.Write(buffer, 0, count);
 
 			ms.Position = 0;
 			inputStream.Close();

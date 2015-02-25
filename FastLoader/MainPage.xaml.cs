@@ -27,6 +27,8 @@ using FastLoader.Data;
 using FastLoader.DB;
 using System.Threading;
 using System.Windows.Media.Imaging;
+using System.Runtime.InteropServices;
+using Windows.Storage.Pickers;
 
 namespace FastLoader
 {
@@ -44,10 +46,11 @@ namespace FastLoader
 		ObservableCollection<string> _completions = new ObservableCollection<string>();
 		bool _nowIsPageRefreshing = false;
 		ApplicationBarMenuItem _changeViewItem;
+        readonly string _currentOsVersion;
 		public MainPage()
 		{
 			InitializeComponent();
-			
+			_currentOsVersion = System.Environment.OSVersion.Version.ToString().Substring(0,3);
 			BuildLocalizedApplicationBar();
 			PhoneApplicationService.Current.Closing += MainPage_ApplicationClosing;
 			PhoneApplicationService.Current.Activated += Current_Activated;
@@ -55,6 +58,9 @@ namespace FastLoader
 			AppSettings.Instance.SaveAutoCompletionsListValueCahnged += Instance_SaveAutoCompletionsListValueCahnged;
 			_currentPage = WebItem.StartPage;
 			History.CacheCleared += SettingsPage_ClearCachePressed;
+            progressBar.Maximum = 100;
+            progressBar.Minimum = 0;
+            searchField.Text = "http://www.lvs.net.ua/info/articles/nastroika_routera.html";
 			browser.Navigate(_currentPage);			
 		}
 
@@ -137,6 +143,7 @@ namespace FastLoader
 				// there we check navigating to new page or back to previous
 				WebItem previousPage = _history.Peek();
 				_currentPage = previousPage;
+
 				browser.Navigate(previousPage.LocalHystoryUri);
 			}			
 		}
@@ -150,9 +157,10 @@ namespace FastLoader
 
 				if (AppSettings.Instance.SaveAutocompletionsList && _completions.Contains(urlAddress) == false)
 					_completions.Insert(0, urlAddress);
-
-				if (urlAddress.IndexOf("http") == -1)
+                                
+                if (urlAddress.IndexOf("http") == -1)
 					urlAddress = "http://" + urlAddress;
+                
 
 				if (Uri.TryCreate(urlAddress, UriKind.Absolute, out outputUri) && Uri.IsWellFormedUriString(urlAddress, UriKind.Absolute) && (sender as AutoCompleteBox).Text.Contains('.'))
 				{
@@ -194,8 +202,19 @@ namespace FastLoader
 				return;
 			}
 
+            string charsetFromHeaders = GetCharsetFromHeaders(response);
+            if (!string.IsNullOrEmpty(charsetFromHeaders) && !charsetFromHeaders.Contains("text"))
+            {                
+                WebBrowserTask task = new WebBrowserTask();
+                task.Uri = _request.HttpRequest.RequestUri;
+                progressBar.IsIndeterminate = false;
+                _request = null;
+                task.Show();
+                return;
+            }
+                
 			Stream temporaryStream;
-			MemoryStream sourceStream = Utils.CopyAndClose(response.GetResponseStream(), (int)response.ContentLength);			
+            MemoryStream sourceStream = Utils.CopyAndClose(response.GetResponseStream(), (int)response.ContentLength, ProgressBarChanged, OnLoadCompleted);			
 
 			bool isZipped = response.Headers[HttpRequestHeader.ContentEncoding] == "gzip";
 			
@@ -215,10 +234,12 @@ namespace FastLoader
 			{
 				//handle encoding
 				charset = GetCharsetFromContent(content);
-				if (charset == "")
+				if (string.IsNullOrEmpty(charset))
 				{
 					charsetContainsInPage = false;
-					charset = GetCharsetFromHeaders(response);
+					charset = charsetFromHeaders;
+                    if (charset.Contains("="))
+                        charset = charset.Substring(charset.IndexOf("=") + 1);
 				}
 			}
 			catch (System.Exception ex)
@@ -248,7 +269,7 @@ namespace FastLoader
 #if DEBUG
 						MessageBox.Show(AppResources.ExceptionMessage + Environment.NewLine + _request.HttpRequest.RequestUri.OriginalString + Environment.NewLine + ex.Message);
 #else
-							MessageBox.Show(AppResources.ExceptionMessage);
+						MessageBox.Show(AppResources.ExceptionMessage);
 #endif
 					});
 					return;
@@ -260,11 +281,8 @@ namespace FastLoader
                 int pos = content.IndexOf("</head>");
 				if (pos != -1)
 					content = content.Insert(pos , string.Format("<meta content=\"{0}\" http-equiv=\"Content-Type\">", DEFAULT_CONTENT_TYPE));
-			}
-
-			if (_currentDomain.Contains("google"))
-				content = Regex.Replace(content, "<input class=\"mlst\".*type=\"text\">", "");
-
+			}			
+            
 			RemoveImgTagsFromPage(ref content);
 			WebItem item = _request.HttpRequest.RequestUri as WebItem;
 
@@ -277,17 +295,33 @@ namespace FastLoader
 				browser.Navigate(item.LocalHystoryUri);
 			});
 		}
+        
+        private void OnLoadCompleted()
+        {
+            Dispatcher.BeginInvoke(() => 
+            {
+                progressBar.Value = 0;
+            });
+        }
+
+        private void ProgressBarChanged(uint pertents)
+        {
+            Dispatcher.BeginInvoke(() => 
+            {
+                progressBar.IsIndeterminate = false;
+                progressBar.Value = pertents;
+            });
+        }
 
 		string GetCharsetFromContent(string content)
 		{
-			//return Regex.Match(content, "<meta.+?charset=([^\";']+)").Groups[1].Value;
-			return Regex.Match(content, "<meta.+?charset=\"?(.+?)[\";']").Groups[1].Value;
+			//return Regex.Match(content, "<meta.+?charset=([^\";']+)").Groups[1].Value;            
+            return Regex.Match(content, "(?i)<meta.+?charset=\"?(.+?)[\";']").Groups[1].Value;
 		}
 
 		string GetCharsetFromHeaders(HttpWebResponse response)
 		{
-			string contentType = response.Headers[HttpRequestHeader.ContentType];
-			return contentType;
+			return response.Headers[HttpRequestHeader.ContentType];
 		}
 
 		void RemoveImgTagsFromPage(ref string pageContent)
@@ -303,7 +337,8 @@ namespace FastLoader
 		{
 			this.Focus();
 			progressBar.IsIndeterminate = true;
-			WebItem navItem = link is WebItem ? link as WebItem : new WebItem(link);
+			WebItem navItem = link is WebItem ? link as WebItem : new WebItem(link);            
+
             _request = new HttpWebRequestIndicate(WebRequest.CreateHttp(navItem));
 			// if it file exists in the storage then load it
 			if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(navItem.LocalHystoryFileName))
@@ -311,11 +346,10 @@ namespace FastLoader
 				browser.Navigate(navItem.LocalHystoryUri);
 			else
 			{				
-				_request.HttpRequest.AllowReadStreamBuffering = false;
-				_request.HttpRequest.UserAgent = "(compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
+				_request.HttpRequest.AllowReadStreamBuffering = false;                
+                _request.HttpRequest.UserAgent = "(compatible; MSIE 10.0; Windows Phone " + _currentOsVersion + "; Trident/6.0; IEMobile/10.0; ARM; Touch;)";
 				_request.BeginGetResponse(new AsyncCallback(HandleResponse), null);
 			}
-			
 		}
 
 		/// <summary>
@@ -352,6 +386,7 @@ namespace FastLoader
 
 		private void browser_Navigating(object sender, NavigatingEventArgs e)
 		{
+            progressBar.IsIndeterminate = true;
 			if (e.Uri.OriginalString.StartsWith("storagefile") == false)
 			{
 				e.Cancel = true;
@@ -464,20 +499,6 @@ namespace FastLoader
 				FormatedSize = Utils.ConvertCountBytesToString(item.Size)
 			};
 
-			for (int i = 0; i < 2500; i++)
-			{
-				cachedItem = new CachedItem()
-				{
-					Link = item.OriginalString,
-					Size = item.Size,
-					OpenTime = DateTime.Now.AddHours(i),
-					Title = Utils.GetTitleFromHtmlPage(content),
-					FormatedSize = Utils.ConvertCountBytesToString(item.Size)
-				};
-
-				FSDBManager.Instance.Cache.InsertOnSubmit(cachedItem);
-				
-			}
 			FSDBManager.Instance.Cache.InsertOnSubmit(cachedItem);
 			FSDBManager.Instance.SubmitChanges();
 		}
@@ -510,10 +531,7 @@ namespace FastLoader
 			appBarMenuItem = new ApplicationBarMenuItem(AppResources.OpenInIE);
 			appBarMenuItem.Click += (object sender, EventArgs e) =>
 			{
-				if (_currentPage == WebItem.StartPage) return;
-				WebBrowserTask task = new WebBrowserTask();
-				task.Uri = _currentPage;
-				task.Show();
+                OpenCurrentPageInIE();
 			};
 			ApplicationBar.MenuItems.Add(appBarMenuItem);
 			
@@ -529,6 +547,14 @@ namespace FastLoader
 			_changeViewItem.Click += ChangeViewMode;
 			ApplicationBar.MenuItems.Add(_changeViewItem);
 		}
+
+        private void OpenCurrentPageInIE()
+        {
+            if (_currentPage == WebItem.StartPage) return;
+            WebBrowserTask task = new WebBrowserTask();
+            task.Uri = _currentPage;
+            task.Show();
+        }
 
 		bool _isPortrait = true;
 		void ChangeViewMode(object sender, EventArgs e)

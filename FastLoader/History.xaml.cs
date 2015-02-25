@@ -354,19 +354,20 @@ namespace FastLoader
 				t.Dispose();
 			t = new Timer(tc, searchText, delay, Timeout.Infinite);
 		}
-		void SearchItems(object state)
+
+		async void SearchItems(object state)
 		{
 			StartDisplayLoading();
 
 			if (_currentList == cache)
-				LoadItems<CachedItem>(state as String);
+				await LoadItems<CachedItem>(state as String);
 			else
-				LoadItems<HistoryItem>(state as String);
-			
+				await LoadItems<HistoryItem>(state as String);
+
 			EndDisplayLoading();
 		}
 
-		async void LoadItems<T>(string searchText) where T : class, IWebItem
+		async Task LoadItems<T>(string searchText) where T : class, IWebItem
 		{
 			var resultItems = await FSDBManager.Instance.GetSortedItemsWhichContain<T>(searchText);
 			Dispatcher.BeginInvoke(() =>

@@ -30,7 +30,7 @@ namespace FastLoader.Classes
         public bool IsAborted
         {
             get;
-            set;
+            private set;
         }
 
 		public void Abort()

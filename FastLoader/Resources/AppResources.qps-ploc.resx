@@ -125,10 +125,27 @@
     <value>qps-ploc</value>
     <comment>Controls the Language and ensures that the font for all elements in the RootFrame aligns with the app's language. Set to the language code of this resource file's language.</comment>
   </data>
-  
-  
-  
-  
-  
-  
-<data name="AboutText" xml:space="preserve"><value>Fast loading pages from internet and offline viewing.</value><comment>7</comment></data><data name="ExceptionMessage" xml:space="preserve"><value>[97A7E][!!_Šõѓŕý, ьûт õρęη ţнé ρâġè óή тнîş ļįйĸ ƒâìļŝ_!!!!!!!!!!!!]</value><comment>2</comment></data><data name="ClearCacheMessage" xml:space="preserve"><value>[AD164][!!_Ċĺèàŕ ĉãćћê âήð ðèļèτę àłľ рѓéνįòùŝľÿ ďòẁиļôáðęď рáĝèş?_!!!!!!!!!!!!!!!!]</value><comment>1</comment></data><data name="ClearCacheMenuItem" xml:space="preserve"><value>[1F245][!!_ĉĺèář ċàčĥê_!!]</value><comment>3</comment></data><data name="Refresh" xml:space="preserve"><value>[BEBE2][!!_Ŕéƒřèŝћ_!!]</value></data><data name="RateApp" xml:space="preserve"><value>[BB6D4][!!_ŕâτę ãррļįčáťíóη_!!!!]</value><comment>5</comment></data></root>
+  <data name="AboutText" xml:space="preserve">
+    <value>Fast loading pages from internet and offline viewing.</value>
+    <comment>7</comment>
+  </data>
+  <data name="ExceptionMessage" xml:space="preserve">
+    <value>[97A7E][!!_Šõѓŕý, ьûт õρęη ţнé ρâġè óή тнîş ļįйĸ ƒâìļŝ_!!!!!!!!!!!!]</value>
+    <comment>2</comment>
+  </data>
+  <data name="ClearCacheMessage" xml:space="preserve">
+    <value>[AD164][!!_Ċĺèàŕ ĉãćћê âήð ðèļèτę àłľ рѓéνįòùŝľÿ ďòẁиļôáðęď рáĝèş?_!!!!!!!!!!!!!!!!]</value>
+    <comment>1</comment>
+  </data>
+  <data name="ClearCacheMenuItem" xml:space="preserve">
+    <value>[1F245][!!_ĉĺèář ċàčĥê_!!]</value>
+    <comment>3</comment>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>[BEBE2][!!_Ŕéƒřèŝћ_!!]</value>
+  </data>
+  <data name="RateApp" xml:space="preserve">
+    <value>[BB6D4][!!_ŕâτę ãррļįčáťíóη_!!!!]</value>
+    <comment>5</comment>
+  </data>
+</root>
