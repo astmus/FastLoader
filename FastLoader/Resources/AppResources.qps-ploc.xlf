@@ -97,6 +97,10 @@
           <source>Portrait mode</source>
           <target state="new">Portrait mode</target>
         </trans-unit>
+        <trans-unit id="Resx/TadyHistoryTitle" translate="yes" xml:space="preserve">
+          <source>Today</source>
+          <target state="new">Today</target>
+        </trans-unit>
         <trans-unit id="Resx/LandscapeMode" translate="yes" xml:space="preserve">
           <source>Landscape mode</source>
           <target state="new">Landscape mode</target>

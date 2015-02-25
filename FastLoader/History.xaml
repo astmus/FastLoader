@@ -116,6 +116,20 @@
         <phone:Pivot Grid.Row="2"  Title="{Binding Path=LocalizedResources.History, Source={StaticResource LocalizedStrings}}"
                      x:Name="MainPivot" SelectionChanged="SelectionChanged"
                     >
+            <phone:PivotItem Header="{Binding Path=LocalizedResources.TadyHistoryTitle, Source={StaticResource LocalizedStrings}}"  x:Name="TodayItems">
+                    <toolkit:LongListMultiSelector x:Name="todayItems" Background="Transparent"
+                                                Margin="0,-8,0,0"
+                                                LayoutMode="List"
+                                                IsGroupingEnabled="True"
+                                                HideEmptyGroups="True"
+                                                JumpListStyle="{StaticResource ItemsJumpListStyle}"
+                                                GroupHeaderTemplate="{StaticResource ItemsGroupHeaderTemplate}" 
+                                                ItemTemplate="{StaticResource CacheItemTemplate}"                                       
+                                       IsSelectionEnabledChanged="items_IsSelectionEnabledChanged"
+                                       SelectionChanged="items_SelectionChanged" ItemRealized="cache_ItemRealized"
+            />
+            </phone:PivotItem>
+                
             <phone:PivotItem Header="{Binding Path=LocalizedResources.CacheTitle, Source={StaticResource LocalizedStrings}}"  x:Name="CacheItem">
                 <toolkit:LongListMultiSelector x:Name="cache" Background="Transparent"
                                                 Margin="0,-8,0,0"

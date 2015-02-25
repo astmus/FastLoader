@@ -95,6 +95,10 @@
           <source>Portrait mode</source>
           <target state="signed-off" state-qualifier="tm-suggestion">Книжковий режим</target>
         </trans-unit>
+        <trans-unit id="Resx/TadyHistoryTitle" translate="yes" xml:space="preserve">
+          <source>Today</source>
+          <target state="translated" state-qualifier="tm-suggestion">Сьогодні</target>
+        </trans-unit>
         <trans-unit id="Resx/LandscapeMode" translate="yes" xml:space="preserve">
           <source>Landscape mode</source>
           <target state="signed-off" state-qualifier="tm-suggestion">Альбомний режим</target>

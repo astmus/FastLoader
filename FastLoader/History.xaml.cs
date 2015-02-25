@@ -49,7 +49,17 @@ namespace FastLoader
 				_currentList.IsSelectionEnabled = false;
 			switch (MainPivot.SelectedIndex)
 			{
-				case 0:
+                case 0:
+                    _currentList = todayItems;
+                    if (todayItems.ItemsSource == null)
+                        InitItems<CachedItem>(todayItems, true);
+                    if (searchBox.Text != _cacheSearchKeyWord)
+                    {
+                        ScheduleSearchItems(searchBox.Text, 100);
+                        _cacheSearchKeyWord = searchBox.Text;
+                    }
+                    break;
+				case 1:
 					_currentList = cache;	
 					if (cache.ItemsSource == null)
 						InitItems<CachedItem>(cache);
@@ -59,7 +69,7 @@ namespace FastLoader
 						_cacheSearchKeyWord = searchBox.Text;
 					}									
 					break;
-				case 1:
+				case 2:
 					_currentList = history;
 					if (history.ItemsSource == null)
 						InitItems<HistoryItem>(history);
@@ -78,6 +88,13 @@ namespace FastLoader
 			list.ItemsSource = await FSDBManager.Instance.GetSortedItems<T>();
 			EndDisplayLoading();
 		}
+
+        async void InitItems<T>(LongListMultiSelector list, bool isToday) where T : class, IWebItem
+        {
+            StartDisplayLoading();
+            list.ItemsSource = await FSDBManager.Instance.GetTodaySortedItems<T>();
+            EndDisplayLoading();
+        }
 
 		void AppBar()
 		{
@@ -132,7 +149,7 @@ namespace FastLoader
 			if (searchBox.Text.Length == 0)
 			{
 				//if search box is empty then we remove all items from cache or history
-				if (_currentList == cache)
+				if (_currentList == cache || _currentList == todayItems)
 					ClearCache();
 				else
 					ClearHistory();
@@ -359,7 +376,7 @@ namespace FastLoader
 		{
 			StartDisplayLoading();
 
-			if (_currentList == cache)
+			if (_currentList == cache || _currentList == todayItems)
 				await LoadItems<CachedItem>(state as String);
 			else
 				await LoadItems<HistoryItem>(state as String);

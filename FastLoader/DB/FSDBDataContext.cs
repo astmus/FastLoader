@@ -75,6 +75,18 @@ namespace FastLoader.DB
 			});
 		}
 
+        public Task<ObservableCollection<ItemsGroup<T>>> GetTodaySortedItems<T>() where T : class, IWebItem
+        {
+            return Task.Factory.StartNew <ObservableCollection<ItemsGroup<T>>>(() =>
+            {
+                _mutex.WaitOne();
+                //Dictionary<String, List<T>>
+                List<ItemsGroup<T>> dates = FSDBManager.Instance.GetTable<T>().Where(w => w.OpenTime.Date.Equals(DateTime.Now.Date)).OrderByDescending(x => x.OpenTime).GroupBy(gb=>gb.OpenTime.Date).Select(s => new ItemsGroup<T>(s.Key, s.ToList())).ToList();
+                _mutex.ReleaseMutex();
+                return new ObservableCollection<ItemsGroup<T>>(dates);
+            });
+        }
+
 		public Task<ObservableCollection<ItemsGroup<T>>> GetSortedItemsWhichContain<T>(string contain) where T : class, IWebItem
 		{
 			return Task.Factory.StartNew<ObservableCollection<ItemsGroup<T>>>(() =>

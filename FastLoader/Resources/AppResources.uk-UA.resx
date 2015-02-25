@@ -200,4 +200,7 @@
   <data name="LandscapeMode" xml:space="preserve">
     <value>Альбомний режим</value>
   </data>
+  <data name="TadyHistoryTitle" xml:space="preserve">
+    <value>Сьогодні</value>
+  </data>
 </root>
