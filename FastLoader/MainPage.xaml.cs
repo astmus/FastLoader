@@ -34,7 +34,7 @@ namespace FastLoader
 {
 	public partial class MainPage : PhoneApplicationPage
 	{
-		const string GOOGLE_SEARCH_DOMAIN = "https://www.google.com/search?q=";
+		const string GOOGLE_SEARCH_DOMAIN = "http://www.google.com/search?btnG=Поиск&gws_rd=ssl&q=";
 		
 		const string DEFAULT_CONTENT_TYPE = "text/html; charset=UTF-8";
 		// Constructor
@@ -60,8 +60,7 @@ namespace FastLoader
 			History.CacheCleared += SettingsPage_ClearCachePressed;
             progressBar.Maximum = 100;
             progressBar.Minimum = 0;
-            searchField.Text = "http://www.lvs.net.ua/info/articles/nastroika_routera.html";
-			browser.Navigate(_currentPage);			
+			browser.Navigate(_currentPage);				
 		}
 
 		void SettingsPage_ClearCachePressed()
@@ -201,13 +200,15 @@ namespace FastLoader
 				});
 				return;
 			}
-
             string charsetFromHeaders = GetCharsetFromHeaders(response);
             if (!string.IsNullOrEmpty(charsetFromHeaders) && !charsetFromHeaders.Contains("text"))
             {                
                 WebBrowserTask task = new WebBrowserTask();
                 task.Uri = _request.HttpRequest.RequestUri;
-                progressBar.IsIndeterminate = false;
+                Dispatcher.BeginInvoke(() =>
+                {
+                    progressBar.IsIndeterminate = false;
+                });
                 _request = null;
                 task.Show();
                 return;
@@ -279,6 +280,8 @@ namespace FastLoader
 			if (charsetContainsInPage == false)
 			{
                 int pos = content.IndexOf("</head>");
+				if (pos == -1)
+					pos = content.IndexOf("</HEAD>");
 				if (pos != -1)
 					content = content.Insert(pos , string.Format("<meta content=\"{0}\" http-equiv=\"Content-Type\">", DEFAULT_CONTENT_TYPE));
 			}			
@@ -426,23 +429,38 @@ namespace FastLoader
 				{
 					_nowIsPageRefreshing = false;
 					return;
-				}
-                bool containCurrentPage = _history.Contains(_currentPage);
-				if (!containCurrentPage)
-				{
-					// if we navigating to new loaded page
-					_history.Push( _currentPage as WebItem);					
-					_currentPage = _request.HttpRequest.RequestUri as WebItem;
-				}
+				}                
+				if (!_history.Contains(_currentPage))
+					InsertToHystory(e);
 				else
-				{
-					// if we step back by history
-					_currentPage = _history.Pop();
-					if (_currentPage != WebItem.StartPage)
-						SetCurrentDomainFromUrl(_currentPage);
-					else
-						_currentDomain = "";
-				}
+					PullOutFromHystory();
+			}
+		}
+
+		private void PullOutFromHystory()
+		{
+			// if we step back by history
+			_currentPage = _history.Pop();
+			if (_currentPage != WebItem.StartPage)
+				SetCurrentDomainFromUrl(_currentPage);
+			else
+				_currentDomain = "";
+		}
+		private void InsertToHystory(NavigatingEventArgs e)
+		{
+			WebItem navItem = _request.HttpRequest.RequestUri as WebItem;
+
+			if (_currentPage != navItem)
+			{
+				// if we navigating to new loaded page
+				_history.Push(_currentPage as WebItem);
+				_currentPage = navItem;
+			}
+			else
+			{
+				//if redirection
+				e.Cancel = true;
+				progressBar.IsIndeterminate = false;
 			}
 		}
 
